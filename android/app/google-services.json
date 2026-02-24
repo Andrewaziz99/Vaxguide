@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "480865338978",
+    "project_id": "vaxguide-fb900",
+    "storage_bucket": "vaxguide-fb900.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480865338978:android:895b4fc90dc1e1b694333b",
+        "android_client_info": {
+          "package_name": "com.andrewmichel.vaxguide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "480865338978-cjshde2gl1vt92g1gun5djh70a8nr7bb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC09Vek9QIn4N0O83yopPfTRZytmYxNX-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "480865338978-cjshde2gl1vt92g1gun5djh70a8nr7bb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480865338978:android:46900f5c1987430994333b",
+        "android_client_info": {
+          "package_name": "com.example.vaxguide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "480865338978-cjshde2gl1vt92g1gun5djh70a8nr7bb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC09Vek9QIn4N0O83yopPfTRZytmYxNX-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "480865338978-cjshde2gl1vt92g1gun5djh70a8nr7bb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
