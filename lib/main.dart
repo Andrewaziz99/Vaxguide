@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vaxguide/core/styles/theme.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
 
@@ -20,6 +21,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [Locale('ar')],
+      title: 'VaxGuide',
       debugShowCheckedModeBanner: false,
       theme: theme,
       home: LoginScreen(),
