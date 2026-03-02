@@ -90,6 +90,11 @@ class UserRepo {
     await _usersRef.doc(uid).update({'userType': userType});
   }
 
+  /// Mark firstLogin as false after user completes their profile.
+  Future<void> markFirstLoginComplete(String uid) async {
+    await _usersRef.doc(uid).update({'firstLogin': false});
+  }
+
   // ── VACCINE HISTORY ──
 
   /// Add a vaccine history entry to the user's record.

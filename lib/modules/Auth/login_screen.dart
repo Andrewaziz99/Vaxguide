@@ -37,6 +37,15 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           if (state is LoginSuccessState) {
             navigateAndFinish(context, const AppLayout());
+          } else if (state is LoginNeedsProfileState) {
+            navigateAndFinish(
+              context,
+              CompleteProfileScreen(
+                uid: state.uid,
+                email: state.email,
+                displayName: '',
+              ),
+            );
           } else if (state is LoginErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

@@ -46,6 +46,7 @@ class UserModel {
   final String address;
   final String gender;
   final String userType; // 'user' or 'admin'
+  final bool firstLogin;
   final DateTime? createdAt;
   final List<VaccineHistoryEntry> vaccineHistory;
 
@@ -58,6 +59,7 @@ class UserModel {
     required this.address,
     required this.gender,
     this.userType = 'user',
+    this.firstLogin = true,
     this.createdAt,
     this.vaccineHistory = const [],
   });
@@ -80,6 +82,7 @@ class UserModel {
       address: data['address'] ?? '',
       gender: data['gender'] ?? '',
       userType: data['userType'] ?? 'user',
+      firstLogin: data['firstLogin'] ?? true,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       vaccineHistory: historyList,
     );
@@ -95,6 +98,7 @@ class UserModel {
       'address': address,
       'gender': gender,
       'userType': userType,
+      'firstLogin': firstLogin,
       'createdAt': createdAt != null
           ? Timestamp.fromDate(createdAt!)
           : FieldValue.serverTimestamp(),
@@ -111,6 +115,7 @@ class UserModel {
     String? address,
     String? gender,
     String? userType,
+    bool? firstLogin,
     DateTime? createdAt,
     List<VaccineHistoryEntry>? vaccineHistory,
   }) {
@@ -123,6 +128,7 @@ class UserModel {
       address: address ?? this.address,
       gender: gender ?? this.gender,
       userType: userType ?? this.userType,
+      firstLogin: firstLogin ?? this.firstLogin,
       createdAt: createdAt ?? this.createdAt,
       vaccineHistory: vaccineHistory ?? this.vaccineHistory,
     );

@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vaxguide/core/constants/auth_constants.dart';
 import 'package:vaxguide/core/network/local/cache_helper.dart';
+import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/styles/theme.dart';
 import 'package:vaxguide/layout/layout.dart';
+import 'package:vaxguide/modules/Auth/complete_profile_screen.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
 import 'package:vaxguide/shared/bloc_observer.dart';
 
@@ -38,9 +40,35 @@ void main() async {
     }
   }
 
-  final Widget startScreen = (isLoggedIn && sessionValid)
-      ? const AppLayout()
-      : const LoginScreen();
+  Widget startScreen;
+  if (isLoggedIn && sessionValid) {
+    // Check if user still needs to complete profile
+    final uid =
+        CacheHelper.getData(key: AuthConstants.cacheKeyUserId) as String?;
+    if (uid != null) {
+      try {
+        final userRepo = UserRepo();
+        final user = await userRepo.getUserById(uid);
+        if (user != null && user.firstLogin) {
+          final email =
+              CacheHelper.getData(key: AuthConstants.cacheKeyEmail) ?? '';
+          startScreen = CompleteProfileScreen(
+            uid: uid,
+            email: email,
+            displayName: user.fullName,
+          );
+        } else {
+          startScreen = const AppLayout();
+        }
+      } catch (_) {
+        startScreen = const AppLayout();
+      }
+    } else {
+      startScreen = const LoginScreen();
+    }
+  } else {
+    startScreen = const LoginScreen();
+  }
 
   runApp(MyApp(startScreen: startScreen));
 }

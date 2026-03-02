@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:vaxguide/core/constants/strings.dart';
 import 'package:vaxguide/core/models/user_model.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
@@ -164,14 +163,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 _isEditing ? _buildEditForm(user) : _buildInfoCards(user),
                 const SizedBox(height: 28),
-
-                // ── Vaccine History Section ──
-                _buildSectionTitle(
-                  profileVaccineHistory,
-                  Icons.vaccines_rounded,
-                ),
-                const SizedBox(height: 12),
-                _buildVaccineHistory(user),
               ],
             ),
           );
@@ -515,145 +506,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  // ── Vaccine History ──
-  Widget _buildVaccineHistory(UserModel user) {
-    if (user.vaccineHistory.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Column(
-          children: [
-            Icon(
-              Icons.vaccines_outlined,
-              size: 48,
-              color: Colors.white.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              profileNoVaccineHistory,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
-                fontSize: 14,
-                fontFamily: 'Alexandria',
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Column(
-      children: user.vaccineHistory.map((entry) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.15),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    // Vaccine icon
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: fischerBlue100.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.vaccines_rounded,
-                        color: fischerBlue100,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    // Details
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            entry.vaccineName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Alexandria',
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.format_list_numbered_rounded,
-                                size: 13,
-                                color: Colors.white.withValues(alpha: 0.5),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '$profileDose: ${entry.dose}',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  fontSize: 12,
-                                  fontFamily: 'Alexandria',
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Icon(
-                                Icons.calendar_today_rounded,
-                                size: 13,
-                                color: Colors.white.withValues(alpha: 0.5),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                DateFormat(
-                                  'yyyy/MM/dd',
-                                ).format(entry.dateAdministered),
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  fontSize: 12,
-                                  fontFamily: 'Alexandria',
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (entry.notes.isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              entry.notes,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.4),
-                                fontSize: 11,
-                                fontFamily: 'Alexandria',
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 

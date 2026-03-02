@@ -13,6 +13,12 @@ class LoginSuccessState extends AuthStates {
   LoginSuccessState(this.uid);
 }
 
+class LoginNeedsProfileState extends AuthStates {
+  final String uid;
+  final String email;
+  LoginNeedsProfileState({required this.uid, required this.email});
+}
+
 class LoginErrorState extends AuthStates {
   final String error;
   LoginErrorState(this.error);

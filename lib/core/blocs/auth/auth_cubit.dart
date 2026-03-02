@@ -53,7 +53,13 @@ class AuthCubit extends Cubit<AuthStates> {
 
       await _saveSessionToCache(uid: uid, email: email.trim());
 
-      emit(LoginSuccessState(uid));
+      // Check if user needs to complete profile
+      final user = await _userRepo.getUserById(uid);
+      if (user != null && user.firstLogin) {
+        emit(LoginNeedsProfileState(uid: uid, email: email.trim()));
+      } else {
+        emit(LoginSuccessState(uid));
+      }
     } on FirebaseAuthException catch (e) {
       debugPrint('Login FirebaseAuthException: ${e.code} - ${e.message}');
       emit(LoginErrorState(_mapFirebaseAuthError(e.code)));
@@ -105,7 +111,20 @@ class AuthCubit extends Cubit<AuthStates> {
 
       if (userExists) {
         await _saveSessionToCache(uid: uid, email: userEmail);
-        emit(GoogleSignInSuccessState(uid));
+
+        // Check if existing user needs to complete profile
+        final user = await _userRepo.getUserById(uid);
+        if (user != null && user.firstLogin) {
+          emit(
+            GoogleSignInNeedsProfileState(
+              uid: uid,
+              email: userEmail,
+              displayName: displayName,
+            ),
+          );
+        } else {
+          emit(GoogleSignInSuccessState(uid));
+        }
       } else {
         emit(
           GoogleSignInNeedsProfileState(
@@ -151,6 +170,7 @@ class AuthCubit extends Cubit<AuthStates> {
         email: email.trim(),
         address: address.trim(),
         gender: gender,
+        firstLogin: false,
       );
 
       await _userRepo.createUser(user);
