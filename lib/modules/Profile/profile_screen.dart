@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:vaxguide/core/constants/strings.dart';
 import 'package:vaxguide/core/models/user_model.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
