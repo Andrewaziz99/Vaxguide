@@ -18,7 +18,7 @@ const userType = 'نوع المستخدم';
 const male = 'ذكر';
 const female = 'أنثى';
 
-const child = 'مخدوم';
+const child = 'طفل';
 const parent = 'ولي أمر';
 const other = 'آخر';
 const password = 'كلمة المرور';
@@ -85,7 +85,7 @@ const selectClassroom = 'اختر الأسرة';
 // Validation messages
 const nameValidation = 'الاسم يجب أن يكون من 3 إلى 50 حرفًا';
 const usernameValidation = 'اسم المستخدم يجب أن يكون من 3 إلى 20 حرفًا';
-const phoneValidation = 'رقم الهاتف يجب أن يكون من 10 إلى 15 رقمًا';
+const phoneValidation = 'رقم الهاتف يجب أن يكون 11 رقمًا';
 const addressValidation = 'العنوان يجب أن يكون من 5 إلى 100 حرفًا';
 const passwordValidation = 'كلمة المرور يجب أن تكون من 6 إلى 20 حرفًا';
 const genericError = 'حدث خطأ غير متوقع. الرجاء المحاولة لاحقًاًا.';
@@ -195,6 +195,13 @@ const signInWithGoogle = 'تسجيل الدخول بحساب جوجل';
 const googleSignInFailed =
     'فشل تسجيل الدخول بحساب جوجل. يرجى المحاولة مرة أخرى';
 const googleSignInCancelled = 'تم إلغاء تسجيل الدخول بحساب جوجل';
+
+// Complete Profile screen strings
+const completeYourProfile = 'أكمل بياناتك الشخصية';
+const completeProfileSubtitle = 'الرجاء إكمال بياناتك للمتابعة';
+const profileCompletedSuccessfully = 'تم حفظ البيانات بنجاح';
+const completeProfileError =
+    'حدث خطأ أثناء حفظ البيانات. الرجاء المحاولة مرة أخرى';
 
 // User-friendly error messages
 const errorInvalidEmail = 'البريد الإلكتروني غير صحيح';

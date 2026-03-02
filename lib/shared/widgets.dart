@@ -452,7 +452,8 @@ class CustomTextField extends StatelessWidget {
   final IconData prefixIconData;
   final FormFieldValidator<String>? validator;
   final TextInputType keyboardType;
-  final Widget? suffixIcon; // ADDED: Optional suffix icon widget
+  final Widget? suffixIcon;
+  final bool obscureText;
 
   const CustomTextField({
     super.key,
@@ -462,7 +463,8 @@ class CustomTextField extends StatelessWidget {
     required this.prefixIconData,
     this.validator,
     this.keyboardType = TextInputType.text,
-    this.suffixIcon, // ADDED: to constructor
+    this.suffixIcon,
+    this.obscureText = false,
   });
 
   @override
@@ -470,7 +472,7 @@ class CustomTextField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      // Standard TextFormField validator property
+      obscureText: obscureText,
       validator: validator,
 
       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
@@ -488,7 +490,7 @@ class CustomTextField extends StatelessWidget {
         ),
 
         // Success message for demonstration
-        helperText: controller.text.isNotEmpty ? 'Enter your data here' : null,
+        helperText: controller.text.isNotEmpty ? '' : null,
         helperStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w600,

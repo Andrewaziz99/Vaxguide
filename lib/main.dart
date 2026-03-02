@@ -1,17 +1,22 @@
+import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:vaxguide/core/network/local/cache_helper.dart';
 import 'package:vaxguide/core/styles/theme.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
+import 'package:vaxguide/shared/bloc_observer.dart';
 
 import 'firebase_options.dart';
 
 void main() async {
-  runApp(const MyApp());
-
   WidgetsFlutterBinding.ensureInitialized();
 
+  Bloc.observer = MyBlocObserver();
+  await CacheHelper.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
