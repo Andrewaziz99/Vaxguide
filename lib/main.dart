@@ -5,8 +5,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vaxguide/core/constants/auth_constants.dart';
 import 'package:vaxguide/core/network/local/cache_helper.dart';
 import 'package:vaxguide/core/styles/theme.dart';
+import 'package:vaxguide/layout/layout.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
-import 'package:vaxguide/modules/Home/home_screen.dart';
 import 'package:vaxguide/shared/bloc_observer.dart';
 
 import 'firebase_options.dart';
@@ -17,6 +17,9 @@ void main() async {
   Bloc.observer = MyBlocObserver();
   await CacheHelper.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // ⚠️ TEMPORARY: Upload sample vaccines to Firestore. Run ONCE then remove these 2 lines.
+  // await seedVaccines();
 
   // Check if user is already logged in and session is still valid
   final bool isLoggedIn =
@@ -36,7 +39,7 @@ void main() async {
   }
 
   final Widget startScreen = (isLoggedIn && sessionValid)
-      ? const HomeScreen()
+      ? const AppLayout()
       : const LoginScreen();
 
   runApp(MyApp(startScreen: startScreen));
