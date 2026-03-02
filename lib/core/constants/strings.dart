@@ -195,6 +195,7 @@ const signInWithGoogle = 'تسجيل الدخول بحساب جوجل';
 const googleSignInFailed =
     'فشل تسجيل الدخول بحساب جوجل. يرجى المحاولة مرة أخرى';
 const googleSignInCancelled = 'تم إلغاء تسجيل الدخول بحساب جوجل';
+const googleSignInLoading = 'جارٍ تسجيل الدخول بحساب جوجل...';
 
 // Complete Profile screen strings
 const completeYourProfile = 'أكمل بياناتك الشخصية';
@@ -243,3 +244,17 @@ const backToRegister = 'العودة للتسجيل';
 const registrationRequestLoadError = 'خطأ في تحميل حالة الطلب';
 const requestNotFound = 'لم يتم العثور على طلب التسجيل';
 const tryAgainOrContactSupport = 'يرجى المحاولة مرة أخرى أو الاتصال بالدعم';
+
+// Drawer strings
+const drawerHome = 'الرئيسية';
+const drawerProfile = 'الملف الشخصي';
+const drawerNotifications = 'الإشعارات';
+const drawerSettings = 'الإعدادات';
+const drawerAbout = 'حول التطبيق';
+const drawerContactUs = 'تواصل معنا';
+const drawerLogout = 'تسجيل الخروج';
+const drawerLogoutConfirmTitle = 'تسجيل الخروج';
+const drawerLogoutConfirmMessage = 'هل أنت متأكد أنك تريد تسجيل الخروج؟';
+const drawerLogoutConfirm = 'خروج';
+const drawerLogoutCancel = 'إلغاء';
+const drawerVersion = 'الإصدار';
