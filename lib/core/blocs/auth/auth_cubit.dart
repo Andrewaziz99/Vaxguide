@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,15 +5,19 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:vaxguide/core/blocs/auth/auth_states.dart';
 import 'package:vaxguide/core/constants/auth_constants.dart';
 import 'package:vaxguide/core/constants/strings.dart';
+import 'package:vaxguide/core/models/user_model.dart';
 import 'package:vaxguide/core/network/local/cache_helper.dart';
+import 'package:vaxguide/core/repositories/user_repo.dart';
 
 class AuthCubit extends Cubit<AuthStates> {
-  AuthCubit() : super(AuthInitialState());
+  AuthCubit({UserRepo? userRepo})
+    : _userRepo = userRepo ?? UserRepo(),
+      super(AuthInitialState());
 
   static AuthCubit get(context) => BlocProvider.of(context);
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final UserRepo _userRepo;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId:
         '480865338978-cjshde2gl1vt92g1gun5djh70a8nr7bb.apps.googleusercontent.com',
@@ -48,7 +51,6 @@ class AuthCubit extends Cubit<AuthStates> {
 
       final uid = userCredential.user!.uid;
 
-      // Save session to cache
       await _saveSessionToCache(uid: uid, email: email.trim());
 
       emit(LoginSuccessState(uid));
@@ -91,25 +93,20 @@ class AuthCubit extends Cubit<AuthStates> {
       final userEmail = userCredential.user!.email ?? '';
       final displayName = userCredential.user!.displayName ?? '';
 
-      // Check if user document already exists in Firestore
+      // Check if user document already exists via repo
       bool userExists = false;
       try {
-        // Force token refresh to ensure Firestore recognizes the auth
         await userCredential.user!.getIdToken(true);
-        final userDoc = await _firestore.collection('users').doc(uid).get();
-        userExists = userDoc.exists;
+        userExists = await _userRepo.userExists(uid);
       } catch (e) {
         debugPrint('Firestore user check failed: $e');
-        // If token refresh or Firestore check fails, treat as new user
         userExists = false;
       }
 
       if (userExists) {
-        // Existing user — go straight to home
         await _saveSessionToCache(uid: uid, email: userEmail);
         emit(GoogleSignInSuccessState(uid));
       } else {
-        // New Google user — needs to complete personal info
         emit(
           GoogleSignInNeedsProfileState(
             uid: uid,
@@ -146,16 +143,17 @@ class AuthCubit extends Cubit<AuthStates> {
     emit(CompleteProfileLoadingState());
 
     try {
-      await _firestore.collection('users').doc(uid).set({
-        'fullName': fullName.trim(),
-        'username': username.trim(),
-        'phone': phone.trim(),
-        'email': email.trim(),
-        'address': address.trim(),
-        'gender': gender,
-        'uid': uid,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      final user = UserModel(
+        uid: uid,
+        fullName: fullName.trim(),
+        username: username.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        address: address.trim(),
+        gender: gender,
+      );
+
+      await _userRepo.createUser(user);
 
       await _saveSessionToCache(uid: uid, email: email.trim());
 
@@ -190,17 +188,17 @@ class AuthCubit extends Cubit<AuthStates> {
 
       final uid = userCredential.user!.uid;
 
-      // Save user profile data to Firestore
-      await _firestore.collection('users').doc(uid).set({
-        'fullName': fullName.trim(),
-        'username': username.trim(),
-        'phone': phone.trim(),
-        'email': email.trim(),
-        'address': address.trim(),
-        'gender': gender,
-        'uid': uid,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      final user = UserModel(
+        uid: uid,
+        fullName: fullName.trim(),
+        username: username.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        address: address.trim(),
+        gender: gender,
+      );
+
+      await _userRepo.createUser(user);
 
       emit(RegisterSuccessState(uid));
     } on FirebaseAuthException catch (e) {
@@ -224,7 +222,6 @@ class AuthCubit extends Cubit<AuthStates> {
       await _auth.signOut();
       await _googleSignIn.signOut();
 
-      // Clear cached session
       await CacheHelper.removeData(key: AuthConstants.cacheKeyUserId);
       await CacheHelper.removeData(key: AuthConstants.cacheKeyIsLoggedIn);
       await CacheHelper.removeData(key: AuthConstants.cacheKeyEmail);

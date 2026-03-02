@@ -5,9 +5,9 @@ import 'package:vaxguide/core/blocs/auth/auth_states.dart';
 import 'package:vaxguide/core/constants/strings.dart';
 import 'package:vaxguide/core/styles/colors.dart';
 import 'package:vaxguide/core/styles/themeScaffold.dart';
+import 'package:vaxguide/layout/layout.dart';
 import 'package:vaxguide/modules/Auth/complete_profile_screen.dart';
 import 'package:vaxguide/modules/Auth/register_screen.dart';
-import 'package:vaxguide/modules/Home/home_screen.dart';
 import 'package:vaxguide/shared/widgets.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: BlocConsumer<AuthCubit, AuthStates>(
         listener: (context, state) {
           if (state is LoginSuccessState) {
-            navigateAndFinish(context, const HomeScreen());
+            navigateAndFinish(context, const AppLayout());
           } else if (state is LoginErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             );
           } else if (state is GoogleSignInSuccessState) {
-            navigateAndFinish(context, const HomeScreen());
+            navigateAndFinish(context, const AppLayout());
           } else if (state is GoogleSignInErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

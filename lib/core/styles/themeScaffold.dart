@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'colors.dart';
 
 // Default background image (used as fallback)
-const String _kDefaultBackgroundImage = 'assets/images/bg.png';
+const String _kDefaultBackgroundImage = 'assets/images/bg1.png';
 
 class ThemedScaffold extends StatelessWidget {
   final Widget? body;

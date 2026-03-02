@@ -5,7 +5,7 @@ import 'package:vaxguide/core/blocs/auth/auth_states.dart';
 import 'package:vaxguide/core/constants/strings.dart';
 import 'package:vaxguide/core/styles/colors.dart';
 import 'package:vaxguide/core/styles/themeScaffold.dart';
-import 'package:vaxguide/modules/Home/home_screen.dart';
+import 'package:vaxguide/layout/layout.dart';
 import 'package:vaxguide/shared/widgets.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -66,7 +66,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 backgroundColor: Colors.green,
               ),
             );
-            navigateAndFinish(context, const HomeScreen());
+            navigateAndFinish(context, const AppLayout());
           } else if (state is CompleteProfileErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
