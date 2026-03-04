@@ -1,147 +1,156 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vaxguide/core/blocs/vaccine/vaccine_search_states.dart';
+import 'package:vaxguide/core/models/vaccine_category.dart';
 import 'package:vaxguide/core/models/vaccine_model.dart';
+import 'package:vaxguide/core/repositories/vaccine_repo.dart';
 
 class VaccineSearchCubit extends Cubit<VaccineSearchStates> {
-  VaccineSearchCubit() : super(VaccineSearchInitialState());
+  final VaccineRepo _vaccineRepo;
+
+  VaccineSearchCubit({VaccineRepo? vaccineRepo})
+    : _vaccineRepo = vaccineRepo ?? VaccineRepo(),
+      super(VaccineSearchInitialState());
 
   static VaccineSearchCubit get(BuildContext context) =>
       BlocProvider.of(context);
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<VaccineModel> vaccines = [];
+  VaccineCategory? selectedCategory;
+  String? selectedSubcategory;
+  List<String> travelCountries = [];
 
-  List<VaccineModel> _allVaccines = [];
-  List<VaccineModel> filteredVaccines = [];
+  // ── NAVIGATION ──
 
-  // ── Current filter/search state ──
-  String _searchQuery = '';
-  String? selectedAgeGroup;
-  String? selectedDisease;
-  String? selectedManufacturer;
+  /// Go back to categories screen.
+  void goToCategories() {
+    selectedCategory = null;
+    selectedSubcategory = null;
+    vaccines = [];
+    emit(VaccineSearchInitialState());
+  }
 
-  // ── Distinct values extracted from data ──
-  List<String> get ageGroups => _allVaccines
-      .map((v) => v.ageGroup)
-      .where((v) => v.isNotEmpty)
-      .toSet()
-      .toList();
+  /// Select a category — show subcategory dropdown.
+  Future<void> selectCategory(VaccineCategory category) async {
+    selectedCategory = category;
+    selectedSubcategory = null;
+    vaccines = [];
 
-  List<String> get diseases => _allVaccines
-      .map((v) => v.disease)
-      .where((v) => v.isNotEmpty)
-      .toSet()
-      .toList();
+    if (category == VaccineCategory.travel) {
+      // Load available countries for autocomplete
+      try {
+        travelCountries = await _vaccineRepo.getTravelCountries();
+      } catch (e) {
+        debugPrint('VaccineSearchCubit getTravelCountries error: $e');
+        travelCountries = [];
+      }
+      emit(VaccineCategorySelectedState(category));
+    } else if (category == VaccineCategory.additional) {
+      // Load dynamic subcategories from Firestore
+      try {
+        final subs = await _vaccineRepo.getSubcategoriesForCategory(
+          category.key,
+        );
+        emit(VaccineCategorySelectedState(category, subcategories: subs));
+      } catch (e) {
+        debugPrint('VaccineSearchCubit getSubcategories error: $e');
+        emit(VaccineCategorySelectedState(category));
+      }
+    } else {
+      // preschool / school — subcategories are static in enum
+      emit(
+        VaccineCategorySelectedState(
+          category,
+          subcategories: category.subcategories,
+        ),
+      );
+    }
+  }
 
-  List<String> get manufacturers => _allVaccines
-      .map((v) => v.manufacturer)
-      .where((v) => v.isNotEmpty)
-      .toSet()
-      .toList();
+  /// Select a subcategory and fetch vaccines.
+  Future<void> selectSubcategory(String subcategory) async {
+    if (selectedCategory == null) return;
 
-  bool get hasActiveFilters =>
-      selectedAgeGroup != null ||
-      selectedDisease != null ||
-      selectedManufacturer != null;
-
-  /// Fetch all vaccines from Firestore once, then filter locally.
-  Future<void> fetchVaccines() async {
+    selectedSubcategory = subcategory;
     emit(VaccineSearchLoadingState());
 
     try {
-      final snapshot = await _firestore
-          .collection('vaccines')
-          .orderBy('name')
-          .get();
+      vaccines = await _vaccineRepo.getVaccinesByCategoryAndSubcategory(
+        selectedCategory!.key,
+        subcategory,
+      );
 
-      _allVaccines = snapshot.docs
-          .map((doc) => VaccineModel.fromFirestore(doc))
-          .toList();
-
-      filteredVaccines = List.from(_allVaccines);
-
-      if (filteredVaccines.isEmpty) {
+      if (vaccines.isEmpty) {
         emit(VaccineSearchEmptyState());
       } else {
         emit(VaccineSearchSuccessState());
       }
     } catch (e) {
-      debugPrint('VaccineSearchCubit fetchVaccines error: $e');
+      debugPrint('VaccineSearchCubit selectSubcategory error: $e');
       emit(VaccineSearchErrorState(e.toString()));
     }
   }
 
-  /// Update search query and re-apply all filters.
-  void searchVaccines(String query) {
-    _searchQuery = query;
-    _applyFilters();
-  }
+  /// Search travel vaccines by country name.
+  Future<void> searchByCountry(String country) async {
+    if (country.trim().isEmpty) return;
 
-  /// Set age group filter and re-apply.
-  void filterByAgeGroup(String? ageGroup) {
-    selectedAgeGroup = ageGroup;
-    _applyFilters();
-  }
+    selectedSubcategory = country;
+    emit(VaccineSearchLoadingState());
 
-  /// Set disease filter and re-apply.
-  void filterByDisease(String? disease) {
-    selectedDisease = disease;
-    _applyFilters();
-  }
+    try {
+      vaccines = await _vaccineRepo.searchTravelVaccinesByCountry(
+        country.trim(),
+      );
 
-  /// Set manufacturer filter and re-apply.
-  void filterByManufacturer(String? manufacturer) {
-    selectedManufacturer = manufacturer;
-    _applyFilters();
-  }
-
-  /// Clear all filters and search.
-  void clearFilters() {
-    selectedAgeGroup = null;
-    selectedDisease = null;
-    selectedManufacturer = null;
-    _searchQuery = '';
-    _applyFilters();
-  }
-
-  /// Core filtering logic — combines search query + all active filters.
-  void _applyFilters() {
-    final trimmed = _searchQuery.trim().toLowerCase();
-
-    filteredVaccines = _allVaccines.where((vaccine) {
-      // Text search
-      if (trimmed.isNotEmpty) {
-        final matchesSearch =
-            vaccine.name.toLowerCase().contains(trimmed) ||
-            vaccine.disease.toLowerCase().contains(trimmed) ||
-            vaccine.manufacturer.toLowerCase().contains(trimmed);
-        if (!matchesSearch) return false;
+      if (vaccines.isEmpty) {
+        emit(VaccineSearchEmptyState());
+      } else {
+        emit(VaccineSearchSuccessState());
       }
+    } catch (e) {
+      debugPrint('VaccineSearchCubit searchByCountry error: $e');
+      emit(VaccineSearchErrorState(e.toString()));
+    }
+  }
 
-      // Age group filter
-      if (selectedAgeGroup != null && vaccine.ageGroup != selectedAgeGroup) {
-        return false;
-      }
+  // ── CRUD (kept for admin features) ──
 
-      // Disease filter
-      if (selectedDisease != null && vaccine.disease != selectedDisease) {
-        return false;
-      }
+  Future<String> addVaccine(VaccineModel vaccine) async {
+    try {
+      final id = await _vaccineRepo.addVaccine(vaccine);
+      return id;
+    } catch (e) {
+      debugPrint('VaccineSearchCubit addVaccine error: $e');
+      emit(VaccineSearchErrorState(e.toString()));
+      rethrow;
+    }
+  }
 
-      // Manufacturer filter
-      if (selectedManufacturer != null &&
-          vaccine.manufacturer != selectedManufacturer) {
-        return false;
-      }
+  Future<VaccineModel?> getVaccineById(String id) async {
+    try {
+      return await _vaccineRepo.getVaccineById(id);
+    } catch (e) {
+      debugPrint('VaccineSearchCubit getVaccineById error: $e');
+      return null;
+    }
+  }
 
-      return true;
-    }).toList();
+  Future<void> updateVaccine(String id, Map<String, dynamic> data) async {
+    try {
+      await _vaccineRepo.updateVaccine(id, data);
+    } catch (e) {
+      debugPrint('VaccineSearchCubit updateVaccine error: $e');
+      emit(VaccineSearchErrorState(e.toString()));
+    }
+  }
 
-    if (filteredVaccines.isEmpty) {
-      emit(VaccineSearchEmptyState());
-    } else {
-      emit(VaccineSearchSuccessState());
+  Future<void> deleteVaccine(String id) async {
+    try {
+      await _vaccineRepo.deleteVaccine(id);
+    } catch (e) {
+      debugPrint('VaccineSearchCubit deleteVaccine error: $e');
+      emit(VaccineSearchErrorState(e.toString()));
     }
   }
 }

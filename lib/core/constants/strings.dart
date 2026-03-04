@@ -265,26 +265,25 @@ const navHistory = 'السجل';
 const navVaccineSearch = 'بحث اللقاحات';
 
 // Vaccine Search strings
-const vaccineSearchHint = 'ابحث عن لقاح بالاسم أو المرض...';
-const vaccineSearchNoResults = 'لا توجد نتائج مطابقة';
-const vaccineSearchError = 'حدث خطأ أثناء تحميل اللقاحات';
+const vaccineSearchTitle = 'دليل التطعيمات';
+const vaccineSearchSubtitle = 'اختر الفئة للبحث عن التطعيمات';
+const vaccineSearchNoResults = 'لا توجد تطعيمات لهذا الاختيار';
+const vaccineSearchError = 'حدث خطأ أثناء تحميل التطعيمات';
 const vaccineSearchRetry = 'إعادة المحاولة';
-const vaccineFilterTitle = 'تصفية اللقاحات';
-const vaccineFilterByAge = 'الفئة العمرية';
-const vaccineFilterByDisease = 'المرض';
-const vaccineFilterByManufacturer = 'الشركة المصنعة';
-const vaccineFilterClearAll = 'مسح الكل';
-const vaccineFilterApply = 'تطبيق';
-const vaccineFilterAll = 'الكل';
+const vaccineSearchBack = 'رجوع';
+const vaccineSelectSubcategory = 'اختر الفئة الفرعية';
+const vaccineTravelSearchHint = 'ابحث باسم الدولة...';
+const vaccineTravelSearchButton = 'بحث';
 
 // Vaccine Detail strings
-const vaccineDescription = 'الوصف';
-const vaccineDisease = 'المرض';
-const vaccineAgeGroup = 'الفئة العمرية';
-const vaccineDoses = 'الجرعات';
-const vaccineSideEffects = 'الأعراض الجانبية';
-const vaccineManufacturer = 'الشركة المصنعة';
-const vaccineNotes = 'ملاحظات';
+const vaccineDetailName = 'اسم التطعيم';
+const vaccineDetailImportance = 'أهمية التطعيم والأمراض التي يقي منها';
+const vaccineDetailSchedule = 'الجدول الزمني وعدد الجرعات ومدة فعاليته';
+const vaccineDetailAdministration = 'طريقة الإعطاء';
+const vaccineDetailSideEffects = 'الآثار الجانبية والأدوية اللازمة لها';
+const vaccineDetailLocations = 'أماكن تلقي التطعيم';
+const vaccineDetailPrecautions = 'الاحتياطات اللازمة قبل أو بعد تلقي التطعيم';
+const vaccineDetailWarnings = 'متى يجب تجنبه أو نصائح أو تحذيرات';
 
 // Profile screen strings
 const profileTitle = 'الملف الشخصي';

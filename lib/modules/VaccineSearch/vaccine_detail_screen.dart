@@ -60,48 +60,48 @@ class VaccineDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Detail cards
-            if (vaccine.description.isNotEmpty)
+            // Detail sections
+            if (vaccine.importance.isNotEmpty)
               _DetailCard(
-                icon: Icons.info_outline_rounded,
-                title: vaccineDescription,
-                content: vaccine.description,
+                icon: Icons.shield_rounded,
+                title: vaccineDetailImportance,
+                content: vaccine.importance,
               ),
-            if (vaccine.disease.isNotEmpty)
+            if (vaccine.schedule.isNotEmpty)
               _DetailCard(
-                icon: Icons.coronavirus_rounded,
-                title: vaccineDisease,
-                content: vaccine.disease,
+                icon: Icons.calendar_month_rounded,
+                title: vaccineDetailSchedule,
+                content: vaccine.schedule,
               ),
-            if (vaccine.ageGroup.isNotEmpty)
+            if (vaccine.administrationMethod.isNotEmpty)
               _DetailCard(
-                icon: Icons.child_care_rounded,
-                title: vaccineAgeGroup,
-                content: vaccine.ageGroup,
-              ),
-            if (vaccine.doses.isNotEmpty)
-              _DetailCard(
-                icon: Icons.format_list_numbered_rounded,
-                title: vaccineDoses,
-                content: vaccine.doses,
+                icon: Icons.medical_services_rounded,
+                title: vaccineDetailAdministration,
+                content: vaccine.administrationMethod,
               ),
             if (vaccine.sideEffects.isNotEmpty)
               _DetailCard(
                 icon: Icons.warning_amber_rounded,
-                title: vaccineSideEffects,
+                title: vaccineDetailSideEffects,
                 content: vaccine.sideEffects,
               ),
-            if (vaccine.manufacturer.isNotEmpty)
+            if (vaccine.locations.isNotEmpty)
               _DetailCard(
-                icon: Icons.factory_rounded,
-                title: vaccineManufacturer,
-                content: vaccine.manufacturer,
+                icon: Icons.location_on_rounded,
+                title: vaccineDetailLocations,
+                content: vaccine.locations,
               ),
-            if (vaccine.notes.isNotEmpty)
+            if (vaccine.precautions.isNotEmpty)
               _DetailCard(
-                icon: Icons.notes_rounded,
-                title: vaccineNotes,
-                content: vaccine.notes,
+                icon: Icons.checklist_rounded,
+                title: vaccineDetailPrecautions,
+                content: vaccine.precautions,
+              ),
+            if (vaccine.warnings.isNotEmpty)
+              _DetailCard(
+                icon: Icons.do_not_disturb_alt_rounded,
+                title: vaccineDetailWarnings,
+                content: vaccine.warnings,
               ),
 
             const SizedBox(height: 24),
