@@ -1,11 +1,17 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vaxguide/core/constants/auth_constants.dart';
 import 'package:vaxguide/core/network/local/cache_helper.dart';
+import 'package:vaxguide/core/network/notification_service.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/styles/theme.dart';
+// ignore: unused_import
+import 'package:vaxguide/core/utils/seed_alerts.dart';
+// ignore: unused_import
+import 'package:vaxguide/core/utils/seed_articles.dart';
 import 'package:vaxguide/layout/layout.dart';
 import 'package:vaxguide/modules/Auth/complete_profile_screen.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
@@ -20,8 +26,14 @@ void main() async {
   await CacheHelper.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // ⚠️ TEMPORARY: Upload sample vaccines to Firestore. Run ONCE then remove these 2 lines.
+  // Initialize push notifications
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await NotificationService.instance.init();
+
+  // ⚠️ TEMPORARY: Upload sample data to Firestore. Run ONCE then re-comment.
   // await seedVaccines();
+  // await seedArticles();
+  // await seedAlerts();
 
   // Check if user is already logged in and session is still valid
   final bool isLoggedIn =
