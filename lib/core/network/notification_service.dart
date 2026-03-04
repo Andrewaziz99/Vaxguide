@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 /// Top-level function required for background message handling.
 /// Must be a top-level function (not a class method).
@@ -25,6 +27,9 @@ class NotificationService {
   Future<void> init() async {
     if (_initialized) return;
     _initialized = true;
+
+    // Initialize timezone database for scheduled notifications
+    tz.initializeTimeZones();
 
     // 1. Request permission (iOS & Android 13+)
     final settings = await _messaging.requestPermission(
@@ -71,6 +76,21 @@ class NotificationService {
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.createNotificationChannel(androidChannel);
+
+    // Create dose reminder notification channel
+    const doseReminderChannel = AndroidNotificationChannel(
+      'dose_reminders_channel',
+      'تذكير بجرعات التطعيم',
+      description: 'إشعارات تذكير بمواعيد الجرعات القادمة',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.createNotificationChannel(doseReminderChannel);
 
     // 4. Handle foreground messages
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
@@ -133,5 +153,77 @@ class NotificationService {
   /// Called when user taps a local notification (foreground).
   void _onNotificationTap(NotificationResponse response) {
     debugPrint('🔔 Local notification tap: ${response.payload}');
+  }
+
+  // ══════════════════════════════════════════
+  // DOSE REMINDERS
+  // ══════════════════════════════════════════
+
+  /// Schedule a local notification to remind the user about the next dose.
+  /// [vaccineId] + [doseNumber] are used to create a unique notification ID.
+  Future<void> scheduleDoseReminder({
+    required String vaccineId,
+    required String vaccineName,
+    required int nextDoseNumber,
+    required String nextDoseLabel,
+    required DateTime scheduledDate,
+  }) async {
+    // Generate a stable notification ID from vaccineId + dose number
+    final notifId = (vaccineId.hashCode + nextDoseNumber) & 0x7FFFFFFF;
+
+    // Schedule at 9:00 AM on the reminder day
+    final scheduledDateTime = DateTime(
+      scheduledDate.year,
+      scheduledDate.month,
+      scheduledDate.day,
+      9,
+      0,
+    );
+
+    // Don't schedule if the date is in the past
+    if (scheduledDateTime.isBefore(DateTime.now())) {
+      debugPrint('🔔 Dose reminder date is in the past, skipping.');
+      return;
+    }
+
+    final tzScheduledDate = tz.TZDateTime.from(scheduledDateTime, tz.local);
+
+    await _localNotifications.zonedSchedule(
+      id: notifId,
+      title: '💉 موعد $nextDoseLabel',
+      body:
+          'حان موعد تلقي $nextDoseLabel من لقاح "$vaccineName". لا تنسَ زيارة أقرب مركز صحي.',
+      scheduledDate: tzScheduledDate,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'dose_reminders_channel',
+          'تذكير بجرعات التطعيم',
+          channelDescription: 'إشعارات تذكير بمواعيد الجرعات القادمة',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+
+    debugPrint(
+      '🔔 Dose reminder scheduled: $vaccineName dose $nextDoseNumber on $scheduledDate',
+    );
+  }
+
+  /// Cancel a previously scheduled dose reminder.
+  Future<void> cancelDoseReminder({
+    required String vaccineId,
+    required int doseNumber,
+  }) async {
+    final notifId = (vaccineId.hashCode + doseNumber) & 0x7FFFFFFF;
+    await _localNotifications.cancel(id: notifId);
+    debugPrint('🔔 Dose reminder cancelled: id=$notifId');
   }
 }

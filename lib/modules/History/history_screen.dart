@@ -7,6 +7,7 @@ import 'package:vaxguide/core/constants/strings.dart';
 import 'package:vaxguide/core/models/user_model.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/styles/colors.dart';
+import 'package:vaxguide/core/utils/dose_schedule_helper.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -86,20 +87,337 @@ class HistoryScreen extends StatelessWidget {
                     fontFamily: 'Alexandria',
                   ),
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  'ابحث عن تطعيم وسجّل جرعتك الأولى',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.35),
+                    fontSize: 13,
+                    fontFamily: 'Alexandria',
+                  ),
+                ),
               ],
             ),
           );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+        // Calculate upcoming doses
+        final upcomingDoses = _calculateUpcomingDoses(history);
+
+        return CustomScrollView(
           physics: const BouncingScrollPhysics(),
-          itemCount: history.length,
-          itemBuilder: (context, index) {
-            return _HistoryCard(entry: history[index]);
-          },
+          slivers: [
+            // ── Upcoming dose reminders ──
+            if (upcomingDoses.isNotEmpty) ...[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.notifications_active_rounded,
+                        color: Colors.amber,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'الجرعات القادمة',
+                        style: TextStyle(
+                          fontFamily: 'Alexandria',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final upcoming = upcomingDoses[index];
+                  return _UpcomingDoseCard(info: upcoming);
+                }, childCount: upcomingDoses.length),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  child: Divider(
+                    color: fischerBlue100.withValues(alpha: 0.15),
+                    thickness: 1,
+                  ),
+                ),
+              ),
+            ],
+
+            // ── History header ──
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.history_rounded,
+                      color: fischerBlue100,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'سجل التطعيمات',
+                      style: TextStyle(
+                        fontFamily: 'Alexandria',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: fischerBlue100,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${history.length} جرعة',
+                      style: TextStyle(
+                        fontFamily: 'Alexandria',
+                        fontSize: 12,
+                        color: Colors.white.withValues(alpha: 0.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── History list ──
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _HistoryCard(entry: history[index]),
+                );
+              }, childCount: history.length),
+            ),
+
+            const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
+          ],
         );
       },
+    );
+  }
+
+  /// Analyze history entries to find vaccines with pending next doses.
+  List<_UpcomingDoseInfo> _calculateUpcomingDoses(
+    List<VaccineHistoryEntry> history,
+  ) {
+    // Group entries by vaccineId
+    final Map<String, List<VaccineHistoryEntry>> grouped = {};
+    for (final entry in history) {
+      grouped.putIfAbsent(entry.vaccineId, () => []).add(entry);
+    }
+
+    final List<_UpcomingDoseInfo> upcoming = [];
+
+    for (final entry in grouped.entries) {
+      final vaccineId = entry.key;
+      final entries = entry.value;
+      if (entries.isEmpty) continue;
+
+      // Sort by date ascending
+      entries.sort((a, b) => a.dateAdministered.compareTo(b.dateAdministered));
+      final latest = entries.last;
+
+      final scheduleInfo = DoseScheduleHelper.getScheduleInfo(
+        latest.vaccineName,
+        '', // We don't have the schedule text here, but the helper works with name
+      );
+
+      final dosesTaken = entries.length;
+      if (dosesTaken >= scheduleInfo.totalDoses) continue;
+
+      final nextDoseDate = scheduleInfo.getNextDoseDate(
+        dosesTaken,
+        latest.dateAdministered,
+      );
+      if (nextDoseDate == null) continue;
+
+      upcoming.add(
+        _UpcomingDoseInfo(
+          vaccineId: vaccineId,
+          vaccineName: latest.vaccineName,
+          nextDoseNumber: dosesTaken + 1,
+          nextDoseLabel: scheduleInfo.getDoseLabel(dosesTaken + 1),
+          scheduledDate: nextDoseDate,
+          totalDoses: scheduleInfo.totalDoses,
+          dosesTaken: dosesTaken,
+        ),
+      );
+    }
+
+    // Sort by nearest date first
+    upcoming.sort((a, b) => a.scheduledDate.compareTo(b.scheduledDate));
+
+    return upcoming;
+  }
+}
+
+// ── Data class for upcoming doses ──
+class _UpcomingDoseInfo {
+  final String vaccineId;
+  final String vaccineName;
+  final int nextDoseNumber;
+  final String nextDoseLabel;
+  final DateTime scheduledDate;
+  final int totalDoses;
+  final int dosesTaken;
+
+  const _UpcomingDoseInfo({
+    required this.vaccineId,
+    required this.vaccineName,
+    required this.nextDoseNumber,
+    required this.nextDoseLabel,
+    required this.scheduledDate,
+    required this.totalDoses,
+    required this.dosesTaken,
+  });
+}
+
+// ── Upcoming Dose Card ──
+class _UpcomingDoseCard extends StatelessWidget {
+  final _UpcomingDoseInfo info;
+  const _UpcomingDoseCard({required this.info});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateStr = DateFormat('yyyy/MM/dd', 'ar').format(info.scheduledDate);
+    final now = DateTime.now();
+    final daysLeft = info.scheduledDate.difference(now).inDays;
+    final isOverdue = daysLeft < 0;
+    final isToday = daysLeft == 0;
+
+    Color statusColor;
+    String statusText;
+    if (isOverdue) {
+      statusColor = red500;
+      statusText = 'متأخر بـ ${-daysLeft} يوم';
+    } else if (isToday) {
+      statusColor = Colors.amber;
+      statusText = 'اليوم!';
+    } else if (daysLeft <= 7) {
+      statusColor = Colors.amber;
+      statusText = 'بعد $daysLeft أيام';
+    } else {
+      statusColor = fischerBlue300;
+      statusText = 'بعد $daysLeft يوم';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  statusColor.withValues(alpha: 0.12),
+                  statusColor.withValues(alpha: 0.05),
+                ],
+                begin: AlignmentDirectional.centerStart,
+                end: AlignmentDirectional.centerEnd,
+              ),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: statusColor.withValues(alpha: 0.25)),
+            ),
+            child: Row(
+              children: [
+                // Icon
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    isOverdue
+                        ? Icons.warning_amber_rounded
+                        : Icons.notifications_active_rounded,
+                    color: statusColor,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        info.vaccineName,
+                        style: const TextStyle(
+                          fontFamily: 'Alexandria',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(
+                            info.nextDoseLabel,
+                            style: TextStyle(
+                              fontFamily: 'Alexandria',
+                              fontSize: 11,
+                              color: statusColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '• $dateStr',
+                            style: TextStyle(
+                              fontFamily: 'Alexandria',
+                              fontSize: 11,
+                              color: Colors.white.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Status badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    statusText,
+                    style: TextStyle(
+                      fontFamily: 'Alexandria',
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: statusColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

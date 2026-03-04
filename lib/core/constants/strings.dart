@@ -336,3 +336,23 @@ const profileNotFound = 'لم يتم العثور على بيانات المست
 const profileEditSuccess = 'تم تحديث البيانات بنجاح';
 const profileEditError = 'حدث خطأ أثناء تحديث البيانات';
 const profileSave = 'حفظ التعديلات';
+
+// Dose Recording strings
+const doseRecordTitle = 'تسجيل جرعة';
+const doseRecordButton = 'سجّل جرعة';
+const doseRecordSuccess = 'تم تسجيل الجرعة بنجاح ✅';
+const doseRecordSuccessWithReminder =
+    'تم تسجيل الجرعة بنجاح ✅ سيتم تذكيرك بالجرعة القادمة';
+const doseRecordError = 'حدث خطأ أثناء تسجيل الجرعة';
+const doseRecordDate = 'تاريخ التطعيم';
+const doseRecordNotes = 'ملاحظات (اختياري)';
+const doseRecordNumber = 'رقم الجرعة';
+const doseRecordProgress = 'تقدم الجرعات';
+const doseRecordSubmit = 'تسجيل الجرعة';
+const doseRecordSubmitting = 'جارٍ التسجيل...';
+const doseUpcoming = 'الجرعات القادمة';
+const doseUpcomingReminder = 'سيتم تذكيرك بموعد';
+const doseOverdue = 'متأخر';
+const doseToday = 'اليوم!';
+const doseDaysLeft = 'بعد';
+const doseSearchAndRecord = 'ابحث عن تطعيم وسجّل جرعتك الأولى';

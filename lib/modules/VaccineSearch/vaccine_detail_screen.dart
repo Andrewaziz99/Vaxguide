@@ -5,6 +5,7 @@ import 'package:vaxguide/core/constants/strings.dart';
 import 'package:vaxguide/core/models/vaccine_model.dart';
 import 'package:vaxguide/core/styles/colors.dart';
 import 'package:vaxguide/core/styles/themeScaffold.dart';
+import 'package:vaxguide/modules/VaccineSearch/record_dose_sheet.dart';
 
 class VaccineDetailScreen extends StatelessWidget {
   final VaccineModel vaccine;
@@ -28,6 +29,21 @@ class VaccineDetailScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        onPressed: () => showRecordDoseSheet(context, vaccine),
+        backgroundColor: fischerBlue500,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text(
+          'سجّل جرعة',
+          style: TextStyle(
+            fontFamily: 'Alexandria',
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
