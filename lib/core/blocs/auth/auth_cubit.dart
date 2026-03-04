@@ -233,6 +233,28 @@ class AuthCubit extends Cubit<AuthStates> {
     }
   }
 
+  // ── Reset Password ──
+
+  Future<void> resetPassword({required String email}) async {
+    emit(ResetPasswordLoadingState());
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      emit(ResetPasswordSuccessState());
+    } on FirebaseAuthException catch (e) {
+      debugPrint(
+        'ResetPassword FirebaseAuthException: ${e.code} - ${e.message}',
+      );
+      emit(ResetPasswordErrorState(_mapFirebaseAuthError(e.code)));
+    } on FirebaseException catch (e) {
+      debugPrint('ResetPassword FirebaseException: ${e.code} - ${e.message}');
+      emit(ResetPasswordErrorState(_mapFirebaseAuthError(e.code)));
+    } catch (e) {
+      debugPrint('ResetPassword unexpected error: $e');
+      emit(ResetPasswordErrorState(errorUnknownError));
+    }
+  }
+
   // ── Logout ──
 
   Future<void> logout() async {

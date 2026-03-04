@@ -86,6 +86,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 displayName: state.displayName,
               ),
             );
+          } else if (state is ResetPasswordSuccessState) {
+            Navigator.of(context, rootNavigator: true).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                backgroundColor: Colors.green,
+                content: Text(
+                  resetPasswordSuccess,
+                  style: TextStyle(fontFamily: 'Alexandria'),
+                ),
+              ),
+            );
+          } else if (state is ResetPasswordErrorState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.red,
+                content: Text(
+                  state.error,
+                  style: const TextStyle(fontFamily: 'Alexandria'),
+                ),
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -205,9 +226,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           Align(
                             alignment: AlignmentDirectional.centerStart,
                             child: TextButton(
-                              onPressed: () {
-                                // TODO: Navigate to forgot password screen
-                              },
+                              onPressed: () => _showResetPasswordDialog(
+                                context,
+                                cubit,
+                              ),
                               child: const Text(
                                 forgotPassword,
                                 style: TextStyle(
@@ -474,6 +496,186 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _showResetPasswordDialog(BuildContext context, AuthCubit cubit) {
+    final resetEmailController = TextEditingController(
+      text: _emailController.text,
+    );
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => BlocProvider.value(
+        value: cubit,
+        child: BlocBuilder<AuthCubit, AuthStates>(
+          builder: (context, state) {
+            final isSending = state is ResetPasswordLoadingState;
+
+            return AlertDialog(
+              backgroundColor: fischerBlue900,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: fischerBlue100.withValues(alpha: 0.2),
+                ),
+              ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: fischerBlue100.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.lock_reset_rounded,
+                      color: fischerBlue100,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      resetPasswordTitle,
+                      style: TextStyle(
+                        fontFamily: 'Alexandria',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      resetPasswordMessage,
+                      style: TextStyle(
+                        fontFamily: 'Alexandria',
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: resetEmailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textDirection: TextDirection.ltr,
+                      style: const TextStyle(
+                        fontFamily: 'Alexandria',
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: email,
+                        labelStyle: TextStyle(
+                          fontFamily: 'Alexandria',
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 13,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.email_outlined,
+                          color: Colors.white.withValues(alpha: 0.5),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: fischerBlue300.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: fischerBlue300),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        filled: true,
+                        fillColor: fischerBlue900.withValues(alpha: 0.5),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return pleaseEnterYourEmail;
+                        }
+                        if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value.trim())) {
+                          return pleaseEnterValidEmail;
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed:
+                      isSending ? null : () => Navigator.pop(ctx),
+                  child: Text(
+                    resetPasswordCancel,
+                    style: TextStyle(
+                      fontFamily: 'Alexandria',
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: isSending
+                      ? null
+                      : () {
+                          if (formKey.currentState!.validate()) {
+                            cubit.resetPassword(
+                              email: resetEmailController.text.trim(),
+                            );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: fischerBlue500,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                  ),
+                  child: isSending
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          resetPasswordSend,
+                          style: TextStyle(
+                            fontFamily: 'Alexandria',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

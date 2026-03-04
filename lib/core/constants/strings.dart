@@ -25,6 +25,14 @@ const password = 'كلمة المرور';
 const confirmPassword = 'تأكيد كلمة المرور';
 
 const forgotPassword = 'نسيت كلمة المرور؟';
+const resetPasswordTitle = 'إعادة تعيين كلمة المرور';
+const resetPasswordMessage =
+    'أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور';
+const resetPasswordSend = 'إرسال الرابط';
+const resetPasswordSending = 'جارٍ الإرسال...';
+const resetPasswordSuccess =
+    'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني ✅';
+const resetPasswordCancel = 'إلغاء';
 const login = 'تسجيل الدخول';
 const next = 'التالي';
 const back = 'رجوع';
