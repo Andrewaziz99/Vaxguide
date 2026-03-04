@@ -36,4 +36,35 @@ class VaccineAlertRepo {
         .where((alert) => !alert.isExpired)
         .toList();
   }
+
+  /// Stream all alerts (including inactive) for admin.
+  Stream<List<VaccineAlertModel>> streamAllAlerts() {
+    return _alertsRef
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => VaccineAlertModel.fromFirestore(doc))
+              .toList(),
+        );
+  }
+
+  // ── CREATE ──
+
+  Future<String> addAlert(VaccineAlertModel alert) async {
+    final docRef = await _alertsRef.add(alert.toMap());
+    return docRef.id;
+  }
+
+  // ── UPDATE ──
+
+  Future<void> updateAlert(String id, Map<String, dynamic> data) async {
+    await _alertsRef.doc(id).update(data);
+  }
+
+  // ── DELETE ──
+
+  Future<void> deleteAlert(String id) async {
+    await _alertsRef.doc(id).delete();
+  }
 }

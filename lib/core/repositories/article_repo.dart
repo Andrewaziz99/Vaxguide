@@ -39,4 +39,35 @@ class ArticleRepo {
         .get();
     return snapshot.docs.map((doc) => ArticleModel.fromFirestore(doc)).toList();
   }
+
+  /// Stream all articles (including unpublished) for admin.
+  Stream<List<ArticleModel>> streamAllArticles() {
+    return _articlesRef
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ArticleModel.fromFirestore(doc))
+              .toList(),
+        );
+  }
+
+  // ── CREATE ──
+
+  Future<String> addArticle(ArticleModel article) async {
+    final docRef = await _articlesRef.add(article.toMap());
+    return docRef.id;
+  }
+
+  // ── UPDATE ──
+
+  Future<void> updateArticle(String id, Map<String, dynamic> data) async {
+    await _articlesRef.doc(id).update(data);
+  }
+
+  // ── DELETE ──
+
+  Future<void> deleteArticle(String id) async {
+    await _articlesRef.doc(id).delete();
+  }
 }

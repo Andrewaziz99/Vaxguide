@@ -9,6 +9,7 @@ import 'package:vaxguide/core/constants/strings.dart';
 import 'package:vaxguide/core/models/user_model.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/styles/colors.dart';
+import 'package:vaxguide/modules/Admin/admin_panel_screen.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
 import 'package:vaxguide/modules/Profile/profile_screen.dart';
 import 'package:vaxguide/shared/widgets.dart';
@@ -56,134 +57,21 @@ class AppDrawer extends StatelessWidget {
                 child: Container(
                   color: fischerBlue900.withValues(alpha: 0.75),
                   child: SafeArea(
-                    child: Column(
-                      children: [
-                        // ── Header with user info ──
-                        _buildDrawerHeader(uid),
-
-                        // ── Divider ──
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Divider(
-                            color: fischerBlue100.withValues(alpha: 0.2),
-                            thickness: 1,
+                    child: uid == null
+                        ? _buildUnauthenticatedDrawer(context, cubit, state)
+                        : StreamBuilder<UserModel?>(
+                            stream: UserRepo().streamUser(uid),
+                            builder: (context, snapshot) {
+                              final user = snapshot.data;
+                              return _buildDrawerContent(
+                                context,
+                                cubit,
+                                state,
+                                uid,
+                                user,
+                              );
+                            },
                           ),
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        // ── Menu Items ──
-                        Expanded(
-                          child: ListView(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            physics: const BouncingScrollPhysics(),
-                            children: [
-                              _DrawerItem(
-                                icon: Icons.person_rounded,
-                                title: drawerProfile,
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  navigateTo(context, const ProfileScreen());
-                                },
-                              ),
-                              _DrawerItem(
-                                icon: Icons.notifications_rounded,
-                                title: drawerNotifications,
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  // TODO: Navigate to notifications screen
-                                },
-                              ),
-                              _DrawerItem(
-                                icon: Icons.settings_rounded,
-                                title: drawerSettings,
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  // TODO: Navigate to settings screen
-                                },
-                              ),
-
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                child: Divider(
-                                  color: fischerBlue100.withValues(alpha: 0.15),
-                                  thickness: 1,
-                                ),
-                              ),
-
-                              _DrawerItem(
-                                icon: Icons.info_outline_rounded,
-                                title: drawerAbout,
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  // TODO: Navigate to about screen
-                                },
-                              ),
-                              _DrawerItem(
-                                icon: Icons.headset_mic_rounded,
-                                title: drawerContactUs,
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  // TODO: Navigate to contact us screen
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // ── Logout Button ──
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 4,
-                          ),
-                          child: Divider(
-                            color: fischerBlue100.withValues(alpha: 0.15),
-                            thickness: 1,
-                          ),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-                          child: state is LogoutLoadingState
-                              ? const Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: SizedBox(
-                                    width: 28,
-                                    height: 28,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: fischerBlue100,
-                                    ),
-                                  ),
-                                )
-                              : _DrawerItem(
-                                  icon: Icons.logout_rounded,
-                                  title: drawerLogout,
-                                  iconColor: red500,
-                                  textColor: red300,
-                                  onTap: () =>
-                                      _showLogoutDialog(context, cubit),
-                                ),
-                        ),
-
-                        // ── Version ──
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(
-                            '$drawerVersion $appVersion',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              fontSize: 12,
-                              fontFamily: 'Alexandria',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),
@@ -194,99 +82,279 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  // ── Drawer Header ──
-  Widget _buildDrawerHeader(String? uid) {
-    if (uid == null) {
-      return _buildHeaderPlaceholder();
-    }
+  // ── Build drawer for unauthenticated state ──
+  Widget _buildUnauthenticatedDrawer(
+    BuildContext context,
+    AuthCubit cubit,
+    AuthStates state,
+  ) {
+    return _buildDrawerContent(context, cubit, state, null, null);
+  }
 
-    final userRepo = UserRepo();
+  // ── Build full drawer content ──
+  Widget _buildDrawerContent(
+    BuildContext context,
+    AuthCubit cubit,
+    AuthStates state,
+    String? uid,
+    UserModel? user,
+  ) {
+    final bool isAdmin = user?.isAdmin ?? false;
 
-    return StreamBuilder<UserModel?>(
-      stream: userRepo.streamUser(uid),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _buildHeaderLoading();
-        }
+    return Column(
+      children: [
+        // ── Header with user info ──
+        _buildDrawerHeaderFromUser(user),
 
-        if (!snapshot.hasData || snapshot.data == null) {
-          return _buildHeaderPlaceholder();
-        }
+        // ── Divider ──
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Divider(
+            color: fischerBlue100.withValues(alpha: 0.2),
+            thickness: 1,
+          ),
+        ),
 
-        final user = snapshot.data!;
+        const SizedBox(height: 8),
 
-        return Container(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-          child: Row(
+        // ── Menu Items ──
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            physics: const BouncingScrollPhysics(),
             children: [
-              // Avatar
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [fischerBlue300, fischerBlue500],
+              _DrawerItem(
+                icon: Icons.person_rounded,
+                title: drawerProfile,
+                onTap: () {
+                  Navigator.pop(context);
+                  navigateTo(context, const ProfileScreen());
+                },
+              ),
+              _DrawerItem(
+                icon: Icons.notifications_rounded,
+                title: drawerNotifications,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to notifications screen
+                },
+              ),
+              _DrawerItem(
+                icon: Icons.settings_rounded,
+                title: drawerSettings,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to settings screen
+                },
+              ),
+
+              // ── Admin Panel (only for admins) ──
+              if (isAdmin) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: fischerBlue500.withValues(alpha: 0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  child: Divider(
+                    color: Colors.amber.withValues(alpha: 0.2),
+                    thickness: 1,
+                  ),
                 ),
-                child: Center(
-                  child: Text(
-                    _getInitials(user.fullName),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Alexandria',
-                    ),
-                  ),
+                _DrawerItem(
+                  icon: Icons.admin_panel_settings_rounded,
+                  title: 'لوحة التحكم',
+                  iconColor: Colors.amber,
+                  textColor: Colors.amber.shade200,
+                  onTap: () {
+                    Navigator.pop(context);
+                    navigateTo(context, const AdminPanelScreen());
+                  },
+                ),
+              ],
+
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Divider(
+                  color: fischerBlue100.withValues(alpha: 0.15),
+                  thickness: 1,
                 ),
               ),
 
-              const SizedBox(width: 14),
-
-              // Name & Email
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.fullName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Alexandria',
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      user.email,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        fontSize: 12,
-                        fontFamily: 'Alexandria',
-                      ),
-                    ),
-                  ],
-                ),
+              _DrawerItem(
+                icon: Icons.info_outline_rounded,
+                title: drawerAbout,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to about screen
+                },
+              ),
+              _DrawerItem(
+                icon: Icons.headset_mic_rounded,
+                title: drawerContactUs,
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to contact us screen
+                },
               ),
             ],
           ),
-        );
-      },
+        ),
+
+        // ── Logout Button ──
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: Divider(
+            color: fischerBlue100.withValues(alpha: 0.15),
+            thickness: 1,
+          ),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+          child: state is LogoutLoadingState
+              ? const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: fischerBlue100,
+                    ),
+                  ),
+                )
+              : _DrawerItem(
+                  icon: Icons.logout_rounded,
+                  title: drawerLogout,
+                  iconColor: red500,
+                  textColor: red300,
+                  onTap: () => _showLogoutDialog(context, cubit),
+                ),
+        ),
+
+        // ── Version ──
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Text(
+            '$drawerVersion $appVersion',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.3),
+              fontSize: 12,
+              fontFamily: 'Alexandria',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── Drawer Header from UserModel ──
+  Widget _buildDrawerHeaderFromUser(UserModel? user) {
+    if (user == null) {
+      return _buildHeaderPlaceholder();
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+      child: Row(
+        children: [
+          // Avatar
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: user.isAdmin
+                    ? [Colors.amber.shade600, Colors.amber.shade800]
+                    : [fischerBlue300, fischerBlue500],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (user.isAdmin ? Colors.amber : fischerBlue500)
+                      .withValues(alpha: 0.4),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                _getInitials(user.fullName),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Alexandria',
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 14),
+
+          // Name & Email & Badge
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.fullName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Alexandria',
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  user.email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontSize: 12,
+                    fontFamily: 'Alexandria',
+                  ),
+                ),
+                if (user.isAdmin) ...[
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.amber.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: const Text(
+                      'مسؤول',
+                      style: TextStyle(
+                        color: Colors.amber,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Alexandria',
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
