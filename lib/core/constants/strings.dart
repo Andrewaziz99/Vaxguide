@@ -259,6 +259,13 @@ const drawerLogoutConfirm = 'خروج';
 const drawerLogoutCancel = 'إلغاء';
 const drawerVersion = 'الإصدار';
 
+// Home screen strings
+const homeLatestNews = 'آخر الأخبار';
+const homeNoArticles = 'لا توجد مقالات حالياً';
+const homeArticleDetail = 'المقال';
+const homeLoadError = 'حدث خطأ أثناء تحميل البيانات';
+const homeRetry = 'إعادة المحاولة';
+
 // Bottom Navigation strings
 const navHome = 'الرئيسية';
 const navHistory = 'السجل';
