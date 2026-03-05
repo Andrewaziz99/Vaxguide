@@ -15,6 +15,7 @@ import 'package:vaxguide/core/utils/seed_articles.dart';
 import 'package:vaxguide/layout/layout.dart';
 import 'package:vaxguide/modules/Auth/complete_profile_screen.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
+import 'package:vaxguide/modules/Splash/splash_screen.dart';
 import 'package:vaxguide/shared/bloc_observer.dart';
 
 import 'firebase_options.dart';
@@ -82,7 +83,7 @@ void main() async {
     startScreen = const LoginScreen();
   }
 
-  runApp(MyApp(startScreen: startScreen));
+  runApp(MyApp(startScreen: SplashScreen(destinationScreen: startScreen)));
 }
 
 class MyApp extends StatelessWidget {
