@@ -59,9 +59,9 @@ exports.sendAlertNotification = onDocumentCreated(
       android: {
         priority: "high",
         notification: {
-          channelId: "vaccine_alerts_channel",
+          channelId: "vaccine_alerts_channel_v2",
           priority: "high",
-          defaultSound: true,
+          sound: "alert_sound",
           defaultVibrateTimings: true,
           clickAction: "FLUTTER_NOTIFICATION_CLICK",
         },
@@ -73,7 +73,7 @@ exports.sendAlertNotification = onDocumentCreated(
               title: notification.title,
               body: notification.body,
             },
-            sound: "default",
+            sound: "alert_sound.wav",
             badge: 1,
           },
         },

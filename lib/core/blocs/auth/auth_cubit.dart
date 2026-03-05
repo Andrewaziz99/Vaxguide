@@ -153,10 +153,8 @@ class AuthCubit extends Cubit<AuthStates> {
   Future<void> completeGoogleProfile({
     required String uid,
     required String fullName,
-    required String username,
     required String phone,
     required String email,
-    required String address,
     required String gender,
   }) async {
     emit(CompleteProfileLoadingState());
@@ -165,10 +163,8 @@ class AuthCubit extends Cubit<AuthStates> {
       final user = UserModel(
         uid: uid,
         fullName: fullName.trim(),
-        username: username.trim(),
         phone: phone.trim(),
         email: email.trim(),
-        address: address.trim(),
         gender: gender,
         firstLogin: false,
       );
@@ -191,11 +187,9 @@ class AuthCubit extends Cubit<AuthStates> {
 
   Future<void> register({
     required String fullName,
-    required String username,
     required String phone,
     required String email,
     required String password,
-    required String address,
     required String gender,
   }) async {
     emit(RegisterLoadingState());
@@ -211,10 +205,8 @@ class AuthCubit extends Cubit<AuthStates> {
       final user = UserModel(
         uid: uid,
         fullName: fullName.trim(),
-        username: username.trim(),
         phone: phone.trim(),
         email: email.trim(),
-        address: address.trim(),
         gender: gender,
       );
 

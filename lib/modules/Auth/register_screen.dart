@@ -21,7 +21,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Step 1: Personal Info
   final _fullNameController = TextEditingController();
-  final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
 
   // Step 2: Account Info
@@ -30,7 +29,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
 
   // Additional Info (in Step 2)
-  final _addressController = TextEditingController();
   String? _selectedGender;
 
   int _currentStep = 1;
@@ -39,12 +37,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void dispose() {
     _fullNameController.dispose();
-    _usernameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -67,11 +63,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         cubit.register(
           fullName: _fullNameController.text,
-          username: _usernameController.text,
           phone: _phoneController.text,
           email: _emailController.text,
           password: _passwordController.text,
-          address: _addressController.text,
           gender: _selectedGender ?? '',
         );
       }
@@ -353,25 +347,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
           const SizedBox(height: 20),
 
-          // Username
-          CustomTextField(
-            controller: _usernameController,
-            hintText: usernameValidation,
-            labelText: username,
-            prefixIconData: Icons.alternate_email,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return usernameValidation;
-              }
-              if (value.length < 3 || value.length > 20) {
-                return usernameValidation;
-              }
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 20),
-
           // Phone
           CustomTextField(
             controller: _phoneController,
@@ -472,25 +447,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               }
               if (value != _passwordController.text) {
                 return passwordsDoNotMatch;
-              }
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 20),
-
-          // Address
-          CustomTextField(
-            controller: _addressController,
-            hintText: addressValidation,
-            labelText: address,
-            prefixIconData: Icons.location_on_outlined,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return addressValidation;
-              }
-              if (value.length < 5 || value.length > 100) {
-                return addressValidation;
               }
               return null;
             },

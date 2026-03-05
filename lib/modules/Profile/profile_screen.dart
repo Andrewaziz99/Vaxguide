@@ -24,9 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Controllers for edit mode
   final _fullNameController = TextEditingController();
-  final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
   String? _selectedGender;
 
   bool _isSaving = false;
@@ -34,17 +32,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _fullNameController.dispose();
-    _usernameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
   void _populateControllers(UserModel user) {
     _fullNameController.text = user.fullName;
-    _usernameController.text = user.username;
     _phoneController.text = user.phone;
-    _addressController.text = user.address;
     _selectedGender = user.gender;
   }
 
@@ -56,9 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _userRepo.updateProfile(
         uid: _uid,
         fullName: _fullNameController.text.trim(),
-        username: _usernameController.text.trim(),
         phone: _phoneController.text.trim(),
-        address: _addressController.text.trim(),
         gender: _selectedGender,
       );
 
@@ -259,14 +251,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          '@${user.username}',
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
-            fontSize: 14,
-            fontFamily: 'Alexandria',
-          ),
-        ),
         if (user.createdAt != null) ...[
           const SizedBox(height: 8),
           Row(
@@ -341,11 +325,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           label: fullName,
           value: user.fullName,
         ),
-        _BlurryInfoRow(
-          icon: Icons.alternate_email_rounded,
-          label: username,
-          value: user.username,
-        ),
+
         _BlurryInfoRow(
           icon: Icons.email_rounded,
           label: email,
@@ -357,19 +337,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           value: user.phone,
         ),
         _BlurryInfoRow(
-          icon: Icons.location_on_rounded,
-          label: address,
-          value: user.address,
-        ),
-        _BlurryInfoRow(
           icon: Icons.wc_rounded,
           label: gender,
           value: user.gender,
-        ),
-        _BlurryInfoRow(
-          icon: Icons.admin_panel_settings_rounded,
-          label: userType,
-          value: user.isAdmin ? 'مسؤول' : 'مستخدم',
         ),
       ],
     );
@@ -385,20 +355,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           controller: _fullNameController,
         ),
         _BlurryEditField(
-          icon: Icons.alternate_email_rounded,
-          label: username,
-          controller: _usernameController,
-        ),
-        _BlurryEditField(
           icon: Icons.phone_rounded,
           label: phone,
           controller: _phoneController,
           keyboardType: TextInputType.phone,
-        ),
-        _BlurryEditField(
-          icon: Icons.location_on_rounded,
-          label: address,
-          controller: _addressController,
         ),
         // Gender dropdown
         Padding(

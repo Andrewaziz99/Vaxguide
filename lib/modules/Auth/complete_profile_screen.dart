@@ -28,9 +28,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
   late final TextEditingController _fullNameController;
-  final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
 
   String? _selectedGender;
 
@@ -44,9 +42,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   @override
   void dispose() {
     _fullNameController.dispose();
-    _usernameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -157,25 +153,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                       const SizedBox(height: 20),
 
-                      // Username
-                      CustomTextField(
-                        controller: _usernameController,
-                        hintText: usernameValidation,
-                        labelText: username,
-                        prefixIconData: Icons.alternate_email,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return usernameValidation;
-                          }
-                          if (value.length < 3 || value.length > 20) {
-                            return usernameValidation;
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 20),
-
                       // Phone
                       CustomTextField(
                         controller: _phoneController,
@@ -189,25 +166,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           }
                           if (value.length < 10 || value.length > 15) {
                             return phoneValidation;
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Address
-                      CustomTextField(
-                        controller: _addressController,
-                        hintText: addressValidation,
-                        labelText: address,
-                        prefixIconData: Icons.location_on_outlined,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return addressValidation;
-                          }
-                          if (value.length < 5 || value.length > 100) {
-                            return addressValidation;
                           }
                           return null;
                         },
@@ -274,10 +232,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                     cubit.completeGoogleProfile(
                                       uid: widget.uid,
                                       fullName: _fullNameController.text,
-                                      username: _usernameController.text,
                                       phone: _phoneController.text,
                                       email: widget.email,
-                                      address: _addressController.text,
                                       gender: _selectedGender ?? '',
                                     );
                                   }

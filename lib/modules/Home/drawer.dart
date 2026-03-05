@@ -13,6 +13,7 @@ import 'package:vaxguide/modules/About/about_screen.dart';
 import 'package:vaxguide/modules/Admin/admin_panel_screen.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
 import 'package:vaxguide/modules/ContactUs/contact_us_screen.dart';
+import 'package:vaxguide/modules/Feedback/feedback_screen.dart';
 import 'package:vaxguide/modules/Profile/profile_screen.dart';
 import 'package:vaxguide/shared/widgets.dart';
 
@@ -199,6 +200,15 @@ class AppDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context);
                   navigateTo(context, const ContactUsScreen());
+                },
+              ),
+              _DrawerItem(
+                icon: Icons.star_rate_rounded,
+                title: drawerFeedback,
+                iconColor: Colors.amber,
+                onTap: () {
+                  Navigator.pop(context);
+                  navigateTo(context, const FeedbackScreen());
                 },
               ),
             ],

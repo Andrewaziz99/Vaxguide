@@ -40,10 +40,8 @@ class VaccineHistoryEntry {
 class UserModel {
   final String uid;
   final String fullName;
-  final String username;
   final String email;
   final String phone;
-  final String address;
   final String gender;
   final String userType; // 'user' or 'admin'
   final bool firstLogin;
@@ -53,10 +51,8 @@ class UserModel {
   const UserModel({
     required this.uid,
     required this.fullName,
-    required this.username,
     required this.email,
     required this.phone,
-    required this.address,
     required this.gender,
     this.userType = 'user',
     this.firstLogin = true,
@@ -76,10 +72,8 @@ class UserModel {
     return UserModel(
       uid: data['uid'] ?? doc.id,
       fullName: data['fullName'] ?? '',
-      username: data['username'] ?? '',
       email: data['email'] ?? '',
       phone: data['phone'] ?? '',
-      address: data['address'] ?? '',
       gender: data['gender'] ?? '',
       userType: data['userType'] ?? 'user',
       firstLogin: data['firstLogin'] ?? true,
@@ -92,10 +86,8 @@ class UserModel {
     return {
       'uid': uid,
       'fullName': fullName,
-      'username': username,
       'email': email,
       'phone': phone,
-      'address': address,
       'gender': gender,
       'userType': userType,
       'firstLogin': firstLogin,
@@ -109,10 +101,8 @@ class UserModel {
   UserModel copyWith({
     String? uid,
     String? fullName,
-    String? username,
     String? email,
     String? phone,
-    String? address,
     String? gender,
     String? userType,
     bool? firstLogin,
@@ -122,10 +112,8 @@ class UserModel {
     return UserModel(
       uid: uid ?? this.uid,
       fullName: fullName ?? this.fullName,
-      username: username ?? this.username,
       email: email ?? this.email,
       phone: phone ?? this.phone,
-      address: address ?? this.address,
       gender: gender ?? this.gender,
       userType: userType ?? this.userType,
       firstLogin: firstLogin ?? this.firstLogin,

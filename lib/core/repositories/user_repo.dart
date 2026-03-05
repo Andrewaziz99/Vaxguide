@@ -71,16 +71,12 @@ class UserRepo {
   Future<void> updateProfile({
     required String uid,
     String? fullName,
-    String? username,
     String? phone,
-    String? address,
     String? gender,
   }) async {
     final Map<String, dynamic> data = {};
     if (fullName != null) data['fullName'] = fullName;
-    if (username != null) data['username'] = username;
     if (phone != null) data['phone'] = phone;
-    if (address != null) data['address'] = address;
     if (gender != null) data['gender'] = gender;
     if (data.isNotEmpty) await _usersRef.doc(uid).update(data);
   }

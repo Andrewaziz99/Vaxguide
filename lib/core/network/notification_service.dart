@@ -62,14 +62,17 @@ class NotificationService {
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
 
-    // Create Android notification channel
+    // Create Android notification channel with custom sound
+    // NOTE: Channel ID changed to v2 to ensure custom sound takes effect
+    // (Android caches channel settings; old channels keep the default sound)
     const androidChannel = AndroidNotificationChannel(
-      'vaccine_alerts_channel',
+      'vaccine_alerts_channel_v2',
       'تنبيهات اللقاحات',
       description: 'إشعارات تنبيهات اللقاحات الجديدة',
       importance: Importance.high,
       playSound: true,
       enableVibration: true,
+      sound: RawResourceAndroidNotificationSound('alert_sound'),
     );
     await _localNotifications
         .resolvePlatformSpecificImplementation<
@@ -77,20 +80,33 @@ class NotificationService {
         >()
         ?.createNotificationChannel(androidChannel);
 
-    // Create dose reminder notification channel
+    // Create dose reminder notification channel with custom sound
     const doseReminderChannel = AndroidNotificationChannel(
-      'dose_reminders_channel',
+      'dose_reminders_channel_v2',
       'تذكير بجرعات التطعيم',
       description: 'إشعارات تذكير بمواعيد الجرعات القادمة',
       importance: Importance.high,
       playSound: true,
       enableVibration: true,
+      sound: RawResourceAndroidNotificationSound('alert_sound'),
     );
     await _localNotifications
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.createNotificationChannel(doseReminderChannel);
+
+    // Clean up old channels (they used default sound)
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.deleteNotificationChannel(channelId: 'vaccine_alerts_channel');
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.deleteNotificationChannel(channelId: 'dose_reminders_channel');
 
     // 4. Handle foreground messages
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
@@ -122,12 +138,15 @@ class NotificationService {
       body: notification.body,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
-          'vaccine_alerts_channel',
+          'vaccine_alerts_channel_v2',
           'تنبيهات اللقاحات',
           channelDescription: 'إشعارات تنبيهات اللقاحات الجديدة',
           importance: Importance.high,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
+          sound: const RawResourceAndroidNotificationSound('alert_sound'),
+          playSound: true,
+          enableVibration: true,
           styleInformation: BigTextStyleInformation(
             notification.body ?? '',
             contentTitle: notification.title,
@@ -137,6 +156,7 @@ class NotificationService {
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
+          sound: 'alert_sound.wav',
         ),
       ),
       payload: message.data.isNotEmpty ? jsonEncode(message.data) : null,
@@ -196,17 +216,21 @@ class NotificationService {
       scheduledDate: tzScheduledDate,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
-          'dose_reminders_channel',
+          'dose_reminders_channel_v2',
           'تذكير بجرعات التطعيم',
           channelDescription: 'إشعارات تذكير بمواعيد الجرعات القادمة',
           importance: Importance.high,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
+          sound: RawResourceAndroidNotificationSound('alert_sound'),
+          playSound: true,
+          enableVibration: true,
         ),
         iOS: DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
+          sound: 'alert_sound.wav',
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
