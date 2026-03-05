@@ -8,10 +8,6 @@ import 'package:vaxguide/core/network/local/cache_helper.dart';
 import 'package:vaxguide/core/network/notification_service.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/styles/theme.dart';
-// ignore: unused_import
-import 'package:vaxguide/core/utils/seed_alerts.dart';
-// ignore: unused_import
-import 'package:vaxguide/core/utils/seed_articles.dart';
 import 'package:vaxguide/layout/layout.dart';
 import 'package:vaxguide/modules/Auth/complete_profile_screen.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
@@ -30,11 +26,6 @@ void main() async {
   // Initialize push notifications
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await NotificationService.instance.init();
-
-  // ⚠️ TEMPORARY: Upload sample data to Firestore. Run ONCE then re-comment.
-  // await seedVaccines();
-  // await seedArticles();
-  // await seedAlerts();
 
   // Check if user is already logged in and session is still valid
   final bool isLoggedIn =
@@ -100,7 +91,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [Locale('ar')],
-      title: 'VaxGuide',
+      title: 'VACCIGUIDE',
       debugShowCheckedModeBanner: false,
       theme: theme,
       home: startScreen,
