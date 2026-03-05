@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vaxguide/core/blocs/admin/admin_states.dart';
 import 'package:vaxguide/core/models/article_model.dart';
+import 'package:vaxguide/core/models/support_ticket_model.dart';
 import 'package:vaxguide/core/models/vaccine_alert_model.dart';
 import 'package:vaxguide/core/models/vaccine_model.dart';
 import 'package:vaxguide/core/repositories/article_repo.dart';
+import 'package:vaxguide/core/repositories/support_repo.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/repositories/vaccine_alert_repo.dart';
 import 'package:vaxguide/core/repositories/vaccine_repo.dart';
@@ -14,16 +16,19 @@ class AdminCubit extends Cubit<AdminStates> {
   final ArticleRepo _articleRepo;
   final VaccineAlertRepo _alertRepo;
   final UserRepo _userRepo;
+  final SupportRepo _supportRepo;
 
   AdminCubit({
     VaccineRepo? vaccineRepo,
     ArticleRepo? articleRepo,
     VaccineAlertRepo? alertRepo,
     UserRepo? userRepo,
+    SupportRepo? supportRepo,
   }) : _vaccineRepo = vaccineRepo ?? VaccineRepo(),
        _articleRepo = articleRepo ?? ArticleRepo(),
        _alertRepo = alertRepo ?? VaccineAlertRepo(),
        _userRepo = userRepo ?? UserRepo(),
+       _supportRepo = supportRepo ?? SupportRepo(),
        super(AdminInitialState());
 
   static AdminCubit get(BuildContext context) => BlocProvider.of(context);
@@ -170,6 +175,57 @@ class AdminCubit extends Cubit<AdminStates> {
       emit(AdminSuccessState('تم حذف المستخدم بنجاح'));
     } catch (e) {
       debugPrint('AdminCubit deleteUser error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  // ══════════════════════════════════════════
+  // SUPPORT TICKETS
+  // ══════════════════════════════════════════
+
+  Stream<List<SupportTicketModel>> streamSupportTickets() =>
+      _supportRepo.streamAllTickets();
+
+  Future<void> replyToTicket(String id, String reply) async {
+    emit(AdminLoadingState());
+    try {
+      await _supportRepo.replyToTicket(id, reply);
+      emit(AdminSuccessState('تم إرسال الرد بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit replyToTicket error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  Future<void> replyAndCloseTicket(String id, String reply) async {
+    emit(AdminLoadingState());
+    try {
+      await _supportRepo.replyAndCloseTicket(id, reply);
+      emit(AdminSuccessState('تم إرسال الرد وإغلاق التذكرة'));
+    } catch (e) {
+      debugPrint('AdminCubit replyAndCloseTicket error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  Future<void> updateTicketStatus(String id, String status) async {
+    emit(AdminLoadingState());
+    try {
+      await _supportRepo.updateTicketStatus(id, status);
+      emit(AdminSuccessState('تم تحديث حالة التذكرة'));
+    } catch (e) {
+      debugPrint('AdminCubit updateTicketStatus error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  Future<void> deleteTicket(String id) async {
+    emit(AdminLoadingState());
+    try {
+      await _supportRepo.deleteTicket(id);
+      emit(AdminSuccessState('تم حذف التذكرة بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit deleteTicket error: $e');
       emit(AdminErrorState(e.toString()));
     }
   }

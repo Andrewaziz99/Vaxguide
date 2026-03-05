@@ -189,15 +189,17 @@ class DoseScheduleInfo {
   DateTime? getNextDoseDate(int currentDose, DateTime currentDoseDate) {
     if (currentDose >= totalDoses) return null;
     final intervalIndex = currentDose - 1;
-    if (intervalIndex < 0 || intervalIndex >= doseIntervalDays.length)
+    if (intervalIndex < 0 || intervalIndex >= doseIntervalDays.length) {
       return null;
+    }
     return currentDoseDate.add(Duration(days: doseIntervalDays[intervalIndex]));
   }
 
   /// Get label for a specific dose (1-based).
   String getDoseLabel(int doseNumber) {
-    if (doseNumber < 1 || doseNumber > doseLabels.length)
+    if (doseNumber < 1 || doseNumber > doseLabels.length) {
       return 'جرعة $doseNumber';
+    }
     return doseLabels[doseNumber - 1];
   }
 }

@@ -268,6 +268,65 @@ const drawerLogoutCancel = 'إلغاء';
 const drawerVersion = 'الإصدار';
 const drawerAdminPanel = 'لوحة التحكم';
 
+// About screen strings
+const aboutVersion = 'الإصدار';
+const aboutWhatIs = 'ما هو $appName؟';
+const aboutDescription =
+    '$appName هو تطبيق صحي شامل يهدف إلى أن يكون دليلك الموثوق لعالم التطعيمات. '
+    'يوفر لك معلومات طبية دقيقة ومحدّثة عن جميع اللقاحات المتاحة، '
+    'ويساعدك على تتبع جرعاتك وجرعات أطفالك بسهولة.\n\n'
+    'سواء كنت أبًا يبحث عن جدول تطعيمات طفلك، أو مسافرًا يحتاج لمعرفة اللقاحات المطلوبة، '
+    'أو ببساطة تريد الاطلاع على آخر الأخبار والتنبيهات الصحية — '
+    '$appName هنا ليرشدك في كل خطوة.';
+
+const aboutFeatures = 'المميزات';
+const aboutFeatureSearch = 'دليل التطعيمات';
+const aboutFeatureSearchDesc =
+    'قاعدة بيانات شاملة للقاحات مصنّفة حسب الفئة العمرية وتطعيمات السفر والتطعيمات الإضافية';
+const aboutFeatureHistory = 'سجل التطعيمات';
+const aboutFeatureHistoryDesc =
+    'سجّل جرعاتك واحتفظ بسجل رقمي كامل لتاريخ تطعيماتك';
+const aboutFeatureReminders = 'تذكير بالجرعات';
+const aboutFeatureRemindersDesc =
+    'إشعارات تلقائية تذكّرك بمواعيد الجرعات القادمة حتى لا تفوّت أي موعد';
+const aboutFeatureAlerts = 'تنبيهات صحية';
+const aboutFeatureAlertsDesc =
+    'تنبيهات فورية عند إضافة لقاحات جديدة أو حملات تطعيم طارئة';
+const aboutFeatureArticles = 'مقالات وأخبار';
+const aboutFeatureArticlesDesc =
+    'مقالات صحية موثوقة عن التطعيمات وآخر المستجدات الطبية';
+const aboutFeatureAdmin = 'لوحة تحكم المسؤول';
+const aboutFeatureAdminDesc =
+    'إدارة كاملة للتطعيمات والمقالات والتنبيهات والمستخدمين';
+
+const aboutBuiltWith = 'مبني بـ';
+const aboutDeveloper = 'المطوّر';
+const aboutDeveloperName = 'Andrew Michel';
+const aboutDeveloperDesc = 'مطور تطبيقات Flutter';
+const aboutCopyright = '© 2026 $appName. جميع الحقوق محفوظة.';
+
+// Contact Us / Support strings
+const contactUsTitle = 'تواصل معنا';
+const contactUsSubtitle = 'نحن هنا لمساعدتك';
+const contactUsDesc = 'أرسل لنا استفسارك أو مشكلتك وسنرد عليك في أقرب وقت';
+const contactUsName = 'الاسم';
+const contactUsEmail = 'البريد الإلكتروني';
+const contactUsSubject = 'الموضوع';
+const contactUsSubjectHint = 'اكتب موضوع رسالتك...';
+const contactUsMessage = 'الرسالة';
+const contactUsMessageHint = 'اكتب رسالتك بالتفصيل...';
+const contactUsFieldRequired = 'هذا الحقل مطلوب';
+const contactUsMessageTooShort = 'الرسالة قصيرة جداً (10 أحرف على الأقل)';
+const contactUsSubmit = 'إرسال';
+const contactUsSubmitting = 'جارٍ الإرسال...';
+const contactUsSuccess = 'تم إرسال رسالتك بنجاح ✅ سنرد عليك قريباً';
+const contactUsError = 'حدث خطأ أثناء الإرسال';
+const contactUsPreviousTickets = 'رسائلك السابقة';
+const contactUsNoTickets = 'لا توجد رسائل سابقة';
+const contactUsStatusOpen = 'مفتوح';
+const contactUsStatusInProgress = 'قيد المعالجة';
+const contactUsStatusResolved = 'تم الحل';
+
 // Admin Panel strings
 const adminPanelTitle = 'لوحة التحكم';
 const adminTabVaccines = 'التطعيمات';

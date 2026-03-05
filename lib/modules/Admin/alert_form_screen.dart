@@ -112,7 +112,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 14),
                     child: DropdownButtonFormField<String>(
-                      value: _severity,
+                      initialValue: _severity,
                       dropdownColor: fischerBlue900,
                       style: const TextStyle(
                         fontFamily: 'Alexandria',
@@ -185,7 +185,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                         Switch(
                           value: _isActive,
                           onChanged: (v) => setState(() => _isActive = v),
-                          activeColor: fischerBlue300,
+                          activeThumbColor: fischerBlue300,
                         ),
                       ],
                     ),

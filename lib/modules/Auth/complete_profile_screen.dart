@@ -217,7 +217,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                       // Gender Dropdown
                       DropdownButtonFormField<String>(
-                        value: _selectedGender,
+                        initialValue: _selectedGender,
                         items: const [
                           DropdownMenuItem(value: 'male', child: Text(male)),
                           DropdownMenuItem(

@@ -6,6 +6,7 @@ import 'package:vaxguide/core/styles/colors.dart';
 import 'package:vaxguide/core/styles/themeScaffold.dart';
 import 'package:vaxguide/modules/Admin/manage_alerts_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_articles_tab.dart';
+import 'package:vaxguide/modules/Admin/manage_support_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_users_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_vaccines_tab.dart';
 
@@ -41,7 +42,7 @@ class AdminPanelScreen extends StatelessWidget {
           }
         },
         child: DefaultTabController(
-          length: 4,
+          length: 5,
           child: ThemedScaffold(
             backgroundImagePath: 'assets/images/bg2.png',
             appBar: AppBar(
@@ -90,6 +91,10 @@ class AdminPanelScreen extends StatelessWidget {
                     icon: Icon(Icons.people_rounded, size: 20),
                     text: 'المستخدمين',
                   ),
+                  Tab(
+                    icon: Icon(Icons.support_agent_rounded, size: 20),
+                    text: 'الدعم',
+                  ),
                 ],
               ),
             ),
@@ -99,6 +104,7 @@ class AdminPanelScreen extends StatelessWidget {
                 ManageArticlesTab(),
                 ManageAlertsTab(),
                 ManageUsersTab(),
+                ManageSupportTab(),
               ],
             ),
           ),

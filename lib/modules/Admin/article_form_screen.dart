@@ -127,7 +127,7 @@ class _ArticleFormScreenState extends State<ArticleFormScreen> {
                         Switch(
                           value: _isPublished,
                           onChanged: (v) => setState(() => _isPublished = v),
-                          activeColor: fischerBlue300,
+                          activeThumbColor: fischerBlue300,
                         ),
                       ],
                     ),

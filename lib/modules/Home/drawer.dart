@@ -9,8 +9,10 @@ import 'package:vaxguide/core/constants/strings.dart';
 import 'package:vaxguide/core/models/user_model.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/styles/colors.dart';
+import 'package:vaxguide/modules/About/about_screen.dart';
 import 'package:vaxguide/modules/Admin/admin_panel_screen.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
+import 'package:vaxguide/modules/ContactUs/contact_us_screen.dart';
 import 'package:vaxguide/modules/Profile/profile_screen.dart';
 import 'package:vaxguide/shared/widgets.dart';
 
@@ -188,7 +190,7 @@ class AppDrawer extends StatelessWidget {
                 title: drawerAbout,
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Navigate to about screen
+                  navigateTo(context, const AboutScreen());
                 },
               ),
               _DrawerItem(
@@ -196,7 +198,7 @@ class AppDrawer extends StatelessWidget {
                 title: drawerContactUs,
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Navigate to contact us screen
+                  navigateTo(context, const ContactUsScreen());
                 },
               ),
             ],
