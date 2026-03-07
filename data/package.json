@@ -1,0 +1,17 @@
+{
+  "name": "vaxguide-data-upload",
+  "version": "1.0.0",
+  "description": "Bulk upload JSON data to Firestore for VaxGuide",
+  "main": "upload.js",
+  "scripts": {
+    "upload": "node upload.js",
+    "upload:categories": "node upload.js --collection vaccine_categories",
+    "upload:vaccines": "node upload.js --collection vaccines",
+    "upload:articles": "node upload.js --collection articles",
+    "upload:alerts": "node upload.js --collection vaccine_alerts"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}
+

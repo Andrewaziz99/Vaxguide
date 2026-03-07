@@ -1,0 +1,43 @@
+[
+  {
+    "key": "preschool",
+    "label": "تطعيمات ما قبل سن المدارس",
+    "icon": "child_care_rounded",
+    "subcategories": [
+      "عند الميلاد",
+      "اول شهر",
+      "شهرين",
+      "٤ شهور",
+      "٦ شهور",
+      "٩ شهور",
+      "١٢ شهر",
+      "١٨ شهر"
+    ]
+  },
+  {
+    "key": "school",
+    "label": "التطعيمات خلال سن المدارس",
+    "icon": "school_rounded",
+    "subcategories": [
+      "اولى حضانة - ٤ سنوات",
+      "اولى ابتدائي - ٦ سنوات",
+      "تانية ابتدائي - ٧ سنوات",
+      "رابعة ابتدائي - ١٠ سنوات",
+      "اولى اعدادى - ١٢ سنة",
+      "اولى ثانوي - ١٥ سنة"
+    ]
+  },
+  {
+    "key": "travel",
+    "label": "تطعيمات السفر",
+    "icon": "flight_rounded",
+    "subcategories": []
+  },
+  {
+    "key": "additional",
+    "label": "تطعيمات إضافية",
+    "icon": "add_circle_outline_rounded",
+    "subcategories": []
+  }
+]
+
