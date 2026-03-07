@@ -48,4 +48,8 @@ app.*.map.json
 /firebase.json
 firestore.rules
 /lib/firebase_options.dart
+
+# Data upload – never commit service account keys
+data/serviceAccountKey.json
+data/node_modules/
 /android/app/google-services.json
