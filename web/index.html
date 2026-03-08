@@ -1,27 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="An Integrated Application for Smart Protection for Every Stage of Life">
-
-    
-    
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -33,16 +18,237 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <title>VACCIGUIDE</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* ── Loading screen styles ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #0D3B66;
+      overflow: hidden;
+    }
+
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #0D3B66 0%, #1A5F99 50%, #0D3B66 100%);
+      font-family: 'Alexandria', 'Segoe UI', Tahoma, sans-serif;
+      transition: opacity 0.5s ease;
+    }
+
+    #loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Pulsing rings behind the logo */
+    .loading-rings {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+
+    .loading-rings .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(179, 215, 238, 0.25);
+      animation: pulse-ring 2.4s ease-out infinite;
+    }
+
+    .loading-rings .ring:nth-child(1) {
+      width: 100%; height: 100%;
+      animation-delay: 0s;
+    }
+    .loading-rings .ring:nth-child(2) {
+      width: 130%; height: 130%;
+      animation-delay: 0.4s;
+    }
+    .loading-rings .ring:nth-child(3) {
+      width: 160%; height: 160%;
+      animation-delay: 0.8s;
+    }
+
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.8); opacity: 0.8; }
+      100% { transform: scale(1.1); opacity: 0; }
+    }
+
+    /* Logo */
+    .loading-logo {
+      position: relative;
+      z-index: 2;
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      animation: logo-breathe 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(179, 215, 238, 0.4));
+    }
+
+    @keyframes logo-breathe {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.06); }
+    }
+
+    /* Title */
+    .loading-title {
+      color: #B3D7EE;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .loading-subtitle {
+      color: rgba(179, 215, 238, 0.7);
+      font-size: 13px;
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+      direction: rtl;
+    }
+
+    /* Spinner track + progress */
+    .loading-spinner-wrap {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(179, 215, 238, 0.15);
+      border-top-color: #B3D7EE;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: rgba(179, 215, 238, 0.6);
+      font-size: 12px;
+      letter-spacing: 1px;
+      direction: rtl;
+      animation: text-fade 1.5s ease-in-out infinite;
+    }
+
+    @keyframes text-fade {
+      0%, 100% { opacity: 0.5; }
+      50%      { opacity: 1; }
+    }
+
+    /* Progress bar */
+    .loading-progress-track {
+      width: 200px;
+      height: 3px;
+      background: rgba(179, 215, 238, 0.1);
+      border-radius: 3px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    .loading-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6BAED6, #B3D7EE);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <!-- Loading screen (visible immediately while Flutter engine loads) -->
+  <div id="loading-screen">
+    <div class="loading-rings">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <img class="loading-logo" src="icons/Icon-192.png" alt="VACCIGUIDE">
+    </div>
+    <div class="loading-title">VACCIGUIDE</div>
+    <div class="loading-subtitle">حماية ذكية لكل مرحلة من حياتك</div>
+    <div class="loading-spinner-wrap">
+      <div class="loading-spinner"></div>
+    </div>
+    <div class="loading-text">جاري التحميل...</div>
+    <div class="loading-progress-track">
+      <div class="loading-progress-bar" id="loading-progress"></div>
+    </div>
+  </div>
+
+  <script>
+    // Simulate incremental progress while Flutter loads
+    (function() {
+      var bar = document.getElementById('loading-progress');
+      var progress = 0;
+      var interval = setInterval(function() {
+        // Slow down as it approaches 90% (never reaches 100 until Flutter is ready)
+        var increment = Math.max(0.5, (90 - progress) * 0.03);
+        progress = Math.min(progress + increment, 90);
+        bar.style.width = progress + '%';
+      }, 100);
+
+      window._loadingInterval = interval;
+      window._loadingBar = bar;
+    })();
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
+
+  <script>
+    // Remove loading screen when Flutter is ready.
+    // We expose a global function that Dart calls after runApp().
+    window._removeLoadingScreen = function() {
+      var bar = window._loadingBar;
+      if (bar) bar.style.width = '100%';
+      clearInterval(window._loadingInterval);
+
+      setTimeout(function() {
+        var el = document.getElementById('loading-screen');
+        if (el) {
+          el.classList.add('fade-out');
+          setTimeout(function() { el.remove(); }, 500);
+        }
+      }, 300);
+    };
+
+    // Fallback: also detect when Flutter adds its rendering element to the DOM
+    var observer = new MutationObserver(function(mutations) {
+      for (var i = 0; i < mutations.length; i++) {
+        for (var j = 0; j < mutations[i].addedNodes.length; j++) {
+          var node = mutations[i].addedNodes[j];
+          if (node.tagName && (node.tagName.toLowerCase() === 'flt-glass-pane' ||
+              node.tagName.toLowerCase() === 'flutter-view')) {
+            // Flutter has rendered — remove loading screen after a short delay
+            setTimeout(function() { window._removeLoadingScreen(); }, 800);
+            observer.disconnect();
+            return;
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Safety fallback: remove loading screen after 15 seconds no matter what
+    setTimeout(function() {
+      if (document.getElementById('loading-screen')) {
+        window._removeLoadingScreen();
+      }
+    }, 15000);
+  </script>
 </body>
 </html>

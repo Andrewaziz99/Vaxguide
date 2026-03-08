@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vaxguide/core/constants/auth_constants.dart';
@@ -13,6 +14,7 @@ import 'package:vaxguide/modules/Auth/complete_profile_screen.dart';
 import 'package:vaxguide/modules/Auth/login_screen.dart';
 import 'package:vaxguide/modules/Splash/splash_screen.dart';
 import 'package:vaxguide/shared/bloc_observer.dart';
+import 'package:vaxguide/shared/web_utils/web_utils.dart';
 
 import 'firebase_options.dart';
 
@@ -75,6 +77,11 @@ void main() async {
   }
 
   runApp(MyApp(startScreen: SplashScreen(destinationScreen: startScreen)));
+
+  // Remove the HTML loading screen on web after Flutter has started
+  if (kIsWeb) {
+    removeWebLoadingScreen();
+  }
 }
 
 class MyApp extends StatelessWidget {

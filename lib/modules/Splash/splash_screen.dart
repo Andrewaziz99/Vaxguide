@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:vaxguide/core/styles/colors.dart';
 
-/// Splash screen with animated shield, rings, orbiting particles, and app branding.
+/// Splash screen with animated logo, rings, orbiting particles, and app branding.
 /// After the animation completes it navigates to [destinationScreen].
 class SplashScreen extends StatefulWidget {
   final Widget destinationScreen;
@@ -19,7 +19,6 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _masterCtrl;
   late final AnimationController _pulseCtrl;
   late final AnimationController _orbitsCtrl;
-  late final AnimationController _shimmerCtrl;
 
   // Staggered entrance animations
   late final Animation<double> _bgFade;
@@ -54,11 +53,6 @@ class _SplashScreenState extends State<SplashScreen>
     _orbitsCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
-    )..repeat();
-
-    _shimmerCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
     )..repeat();
 
     _bgFade = _curve(0.00, 0.25, Curves.easeOut);
@@ -112,7 +106,6 @@ class _SplashScreenState extends State<SplashScreen>
     _masterCtrl.dispose();
     _pulseCtrl.dispose();
     _orbitsCtrl.dispose();
-    _shimmerCtrl.dispose();
     super.dispose();
   }
 
@@ -122,12 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     return Scaffold(
       body: AnimatedBuilder(
-        animation: Listenable.merge([
-          _masterCtrl,
-          _pulseCtrl,
-          _orbitsCtrl,
-          _shimmerCtrl,
-        ]),
+        animation: Listenable.merge([_masterCtrl, _pulseCtrl, _orbitsCtrl]),
         builder: (context, _) {
           return Container(
             width: double.infinity,
@@ -184,7 +172,7 @@ class _SplashScreenState extends State<SplashScreen>
                 _ring(140, _ringScale2.value, 0.10),
                 _ring(100, _ringScale1.value, 0.15),
 
-                // ── Pulse glow behind shield
+                // ── Pulse glow behind logo
                 Opacity(
                   opacity: 0.18 + _pulseCtrl.value * 0.18,
                   child: Transform.scale(
@@ -206,12 +194,17 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
 
-                // ── Shield icon
+                // ── Logo icon
                 Opacity(
                   opacity: _shieldFade.value,
                   child: Transform.scale(
                     scale: _shieldScale.value,
-                    child: _ShieldWidget(shimmer: _shimmerCtrl.value),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
 
@@ -351,119 +344,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-}
-
-// ── Shield Widget ─────────────────────────────────────────────────────────────
-class _ShieldWidget extends StatelessWidget {
-  final double shimmer;
-  const _ShieldWidget({required this.shimmer});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 110,
-      height: 110,
-      child: CustomPaint(painter: _ShieldPainter(shimmer)),
-    );
-  }
-}
-
-class _ShieldPainter extends CustomPainter {
-  final double shimmer;
-  _ShieldPainter(this.shimmer);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    // Shield path
-    final path = Path()
-      ..moveTo(w * 0.5, 0)
-      ..lineTo(w, h * 0.25)
-      ..lineTo(w, h * 0.55)
-      ..quadraticBezierTo(w, h * 0.85, w * 0.5, h)
-      ..quadraticBezierTo(0, h * 0.85, 0, h * 0.55)
-      ..lineTo(0, h * 0.25)
-      ..close();
-
-    // Shield fill gradient
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          fischerBlue500.withValues(alpha: 0.9),
-          fischerBlue700.withValues(alpha: 0.95),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, w, h));
-
-    canvas.drawPath(path, fillPaint);
-
-    // Shimmer sweep
-    final shimmerAngle = shimmer * math.pi * 2;
-    final shimmerPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment(math.cos(shimmerAngle), math.sin(shimmerAngle)),
-        end: Alignment(-math.cos(shimmerAngle), -math.sin(shimmerAngle)),
-        colors: [
-          Colors.white.withValues(alpha: 0.0),
-          Colors.white.withValues(alpha: 0.18),
-          Colors.white.withValues(alpha: 0.0),
-        ],
-        stops: const [0.0, 0.5, 1.0],
-      ).createShader(Rect.fromLTWH(0, 0, w, h));
-    canvas.drawPath(path, shimmerPaint);
-
-    // Shield border
-    final borderPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [fischerBlue100, fischerBlue300],
-      ).createShader(Rect.fromLTWH(0, 0, w, h));
-    canvas.drawPath(path, borderPaint);
-
-    // Cross icon inside shield
-    _drawCross(canvas, size);
-  }
-
-  void _drawCross(Canvas canvas, Size size) {
-    final cx = size.width / 2;
-    final cy = size.height / 2 + 4;
-    final paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 3.5
-      ..strokeCap = StrokeCap.round;
-
-    const arm = 14.0;
-    canvas.drawLine(Offset(cx, cy - arm), Offset(cx, cy + arm), paint);
-    canvas.drawLine(Offset(cx - arm, cy), Offset(cx + arm, cy), paint);
-
-    // Small syringe needle on top
-    final needlePaint = Paint()
-      ..color = fischerBlue100
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(
-      Offset(cx, cy - arm),
-      Offset(cx, cy - arm - 10),
-      needlePaint,
-    );
-
-    // Needle tip dot
-    canvas.drawCircle(
-      Offset(cx, cy - arm - 10),
-      2,
-      Paint()..color = Colors.white,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_ShieldPainter oldDelegate) =>
-      oldDelegate.shimmer != shimmer;
 }
 
 // ── Orbiting Particles ────────────────────────────────────────────────────────
