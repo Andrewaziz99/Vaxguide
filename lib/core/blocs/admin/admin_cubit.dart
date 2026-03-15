@@ -4,11 +4,13 @@ import 'package:vaxguide/core/blocs/admin/admin_states.dart';
 import 'package:vaxguide/core/models/article_model.dart';
 import 'package:vaxguide/core/models/support_ticket_model.dart';
 import 'package:vaxguide/core/models/vaccine_alert_model.dart';
+import 'package:vaxguide/core/models/vaccine_category_model.dart';
 import 'package:vaxguide/core/models/vaccine_model.dart';
 import 'package:vaxguide/core/repositories/article_repo.dart';
 import 'package:vaxguide/core/repositories/support_repo.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/repositories/vaccine_alert_repo.dart';
+import 'package:vaxguide/core/repositories/vaccine_category_repo.dart';
 import 'package:vaxguide/core/repositories/vaccine_repo.dart';
 
 class AdminCubit extends Cubit<AdminStates> {
@@ -17,6 +19,7 @@ class AdminCubit extends Cubit<AdminStates> {
   final VaccineAlertRepo _alertRepo;
   final UserRepo _userRepo;
   final SupportRepo _supportRepo;
+  final VaccineCategoryRepo _categoryRepo;
 
   AdminCubit({
     VaccineRepo? vaccineRepo,
@@ -24,11 +27,13 @@ class AdminCubit extends Cubit<AdminStates> {
     VaccineAlertRepo? alertRepo,
     UserRepo? userRepo,
     SupportRepo? supportRepo,
+    VaccineCategoryRepo? categoryRepo,
   }) : _vaccineRepo = vaccineRepo ?? VaccineRepo(),
        _articleRepo = articleRepo ?? ArticleRepo(),
        _alertRepo = alertRepo ?? VaccineAlertRepo(),
        _userRepo = userRepo ?? UserRepo(),
        _supportRepo = supportRepo ?? SupportRepo(),
+       _categoryRepo = categoryRepo ?? VaccineCategoryRepo(),
        super(AdminInitialState());
 
   static AdminCubit get(BuildContext context) => BlocProvider.of(context);
@@ -226,6 +231,74 @@ class AdminCubit extends Cubit<AdminStates> {
       emit(AdminSuccessState('تم حذف التذكرة بنجاح'));
     } catch (e) {
       debugPrint('AdminCubit deleteTicket error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  // ══════════════════════════════════════════
+  // VACCINE CATEGORIES
+  // ══════════════════════════════════════════
+
+  Stream<List<VaccineCategoryModel>> streamCategories() =>
+      _categoryRepo.streamAllCategories();
+
+  Future<void> addCategory(VaccineCategoryModel category) async {
+    emit(AdminLoadingState());
+    try {
+      await _categoryRepo.setCategory(category);
+      emit(AdminSuccessState('تم إضافة الفئة بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit addCategory error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  Future<void> updateCategory(VaccineCategoryModel category) async {
+    emit(AdminLoadingState());
+    try {
+      await _categoryRepo.setCategory(category);
+      emit(AdminSuccessState('تم تحديث الفئة بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit updateCategory error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  Future<void> deleteCategory(String key) async {
+    emit(AdminLoadingState());
+    try {
+      await _categoryRepo.deleteCategory(key);
+      emit(AdminSuccessState('تم حذف الفئة بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit deleteCategory error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  Future<void> addSubcategoryToCategory(
+    String categoryKey,
+    String subcategory,
+  ) async {
+    emit(AdminLoadingState());
+    try {
+      await _categoryRepo.addSubcategory(categoryKey, subcategory);
+      emit(AdminSuccessState('تم إضافة الفئة الفرعية بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit addSubcategory error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  Future<void> removeSubcategoryFromCategory(
+    String categoryKey,
+    String subcategory,
+  ) async {
+    emit(AdminLoadingState());
+    try {
+      await _categoryRepo.removeSubcategory(categoryKey, subcategory);
+      emit(AdminSuccessState('تم حذف الفئة الفرعية بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit removeSubcategory error: $e');
       emit(AdminErrorState(e.toString()));
     }
   }

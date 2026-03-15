@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vaxguide/core/blocs/vaccine/vaccine_search_cubit.dart';
 import 'package:vaxguide/core/blocs/vaccine/vaccine_search_states.dart';
 import 'package:vaxguide/core/constants/strings.dart';
-import 'package:vaxguide/core/models/vaccine_category.dart';
+import 'package:vaxguide/core/models/vaccine_category_model.dart';
 import 'package:vaxguide/core/models/vaccine_model.dart';
 import 'package:vaxguide/core/styles/colors.dart';
 import 'package:vaxguide/modules/VaccineSearch/vaccine_detail_screen.dart';
@@ -45,9 +45,16 @@ class _VaccineSearchBodyState extends State<_VaccineSearchBody> {
       builder: (context, state) {
         final cubit = VaccineSearchCubit.get(context);
 
-        // ── Initial — show 4 category buttons ──
+        // ── Categories loading ──
+        if (state is VaccineSearchCategoriesLoadingState) {
+          return const Center(
+            child: CircularProgressIndicator(color: fischerBlue100),
+          );
+        }
+
+        // ── Initial — show category buttons ──
         if (state is VaccineSearchInitialState) {
-          return _buildCategoriesView(context, cubit);
+          return _buildCategoriesView(context, cubit, state.categories);
         }
 
         // ── Category selected — show subcategory dropdown ──
@@ -96,8 +103,7 @@ class _VaccineSearchBodyState extends State<_VaccineSearchBody> {
                     TextButton.icon(
                       onPressed: () {
                         if (cubit.selectedSubcategory != null) {
-                          if (cubit.selectedCategory ==
-                              VaccineCategory.travel) {
+                          if (cubit.selectedCategory?.isTravel == true) {
                             cubit.searchByCountry(cubit.selectedSubcategory!);
                           } else {
                             cubit.selectSubcategory(cubit.selectedSubcategory!);
@@ -173,9 +179,13 @@ class _VaccineSearchBodyState extends State<_VaccineSearchBody> {
   }
 
   // ═══════════════════════════════════════════
-  // ── Categories View (4 big buttons)
+  // ── Categories View (dynamic buttons)
   // ═══════════════════════════════════════════
-  Widget _buildCategoriesView(BuildContext context, VaccineSearchCubit cubit) {
+  Widget _buildCategoriesView(
+    BuildContext context,
+    VaccineSearchCubit cubit,
+    List<VaccineCategoryModel> categories,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
       child: Column(
@@ -212,8 +222,8 @@ class _VaccineSearchBodyState extends State<_VaccineSearchBody> {
           ),
           const SizedBox(height: 28),
 
-          // Category buttons
-          ...VaccineCategory.values.map(
+          // Category buttons (dynamic from Firestore)
+          ...categories.map(
             (cat) => Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: _CategoryButton(
@@ -262,7 +272,7 @@ class _VaccineSearchBodyState extends State<_VaccineSearchBody> {
                 ),
               ),
               const SizedBox(width: 12),
-              Icon(state.category.icon, color: fischerBlue100, size: 24),
+              Icon(state.category.iconData, color: fischerBlue100, size: 24),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -280,7 +290,7 @@ class _VaccineSearchBodyState extends State<_VaccineSearchBody> {
           const SizedBox(height: 24),
 
           // Travel → country search field
-          if (state.category == VaccineCategory.travel) ...[
+          if (state.category.isTravel) ...[
             _buildTravelSearch(context, cubit),
           ] else ...[
             // Preschool / School / Additional → dropdown
@@ -542,7 +552,7 @@ class _VaccineSearchBodyState extends State<_VaccineSearchBody> {
               ),
               const SizedBox(width: 12),
               if (category != null)
-                Icon(category.icon, color: fischerBlue100, size: 22),
+                Icon(category.iconData, color: fischerBlue100, size: 22),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -571,7 +581,7 @@ class _VaccineSearchBodyState extends State<_VaccineSearchBody> {
 // ── Category Button Widget
 // ═══════════════════════════════════════════
 class _CategoryButton extends StatelessWidget {
-  final VaccineCategory category;
+  final VaccineCategoryModel category;
   final VoidCallback onTap;
 
   const _CategoryButton({required this.category, required this.onTap});
@@ -601,7 +611,11 @@ class _CategoryButton extends StatelessWidget {
                     color: fischerBlue100.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(category.icon, color: fischerBlue100, size: 28),
+                  child: Icon(
+                    category.iconData,
+                    color: fischerBlue100,
+                    size: 28,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(

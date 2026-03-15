@@ -1,13 +1,19 @@
-import 'package:vaxguide/core/models/vaccine_category.dart';
+import 'package:vaxguide/core/models/vaccine_category_model.dart';
 
 abstract class VaccineSearchStates {}
 
-/// Initial state — show 4 category buttons.
-class VaccineSearchInitialState extends VaccineSearchStates {}
+/// Initial state — show category buttons loaded from Firestore.
+class VaccineSearchInitialState extends VaccineSearchStates {
+  final List<VaccineCategoryModel> categories;
+  VaccineSearchInitialState({this.categories = const []});
+}
+
+/// Categories are loading from Firestore.
+class VaccineSearchCategoriesLoadingState extends VaccineSearchStates {}
 
 /// A category was selected — show subcategory dropdown.
 class VaccineCategorySelectedState extends VaccineSearchStates {
-  final VaccineCategory category;
+  final VaccineCategoryModel category;
   final List<String> subcategories;
   VaccineCategorySelectedState(this.category, {this.subcategories = const []});
 }

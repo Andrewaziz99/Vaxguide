@@ -1,24 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vaxguide/core/blocs/vaccine/vaccine_search_states.dart';
-import 'package:vaxguide/core/models/vaccine_category.dart';
+import 'package:vaxguide/core/models/vaccine_category_model.dart';
 import 'package:vaxguide/core/models/vaccine_model.dart';
+import 'package:vaxguide/core/repositories/vaccine_category_repo.dart';
 import 'package:vaxguide/core/repositories/vaccine_repo.dart';
 
 class VaccineSearchCubit extends Cubit<VaccineSearchStates> {
   final VaccineRepo _vaccineRepo;
+  final VaccineCategoryRepo _categoryRepo;
 
-  VaccineSearchCubit({VaccineRepo? vaccineRepo})
-    : _vaccineRepo = vaccineRepo ?? VaccineRepo(),
-      super(VaccineSearchInitialState());
+  VaccineSearchCubit({
+    VaccineRepo? vaccineRepo,
+    VaccineCategoryRepo? categoryRepo,
+  }) : _vaccineRepo = vaccineRepo ?? VaccineRepo(),
+       _categoryRepo = categoryRepo ?? VaccineCategoryRepo(),
+       super(VaccineSearchCategoriesLoadingState()) {
+    _loadCategories();
+  }
 
   static VaccineSearchCubit get(BuildContext context) =>
       BlocProvider.of(context);
 
   List<VaccineModel> vaccines = [];
-  VaccineCategory? selectedCategory;
+  List<VaccineCategoryModel> categories = [];
+  VaccineCategoryModel? selectedCategory;
   String? selectedSubcategory;
   List<String> travelCountries = [];
+
+  // ── LOAD CATEGORIES FROM FIRESTORE ──
+
+  Future<void> _loadCategories() async {
+    try {
+      categories = await _categoryRepo.getAllCategories();
+      emit(VaccineSearchInitialState(categories: categories));
+    } catch (e) {
+      debugPrint('VaccineSearchCubit _loadCategories error: $e');
+      // Fall back to empty categories
+      emit(VaccineSearchInitialState(categories: []));
+    }
+  }
 
   // ── NAVIGATION ──
 
@@ -27,16 +48,16 @@ class VaccineSearchCubit extends Cubit<VaccineSearchStates> {
     selectedCategory = null;
     selectedSubcategory = null;
     vaccines = [];
-    emit(VaccineSearchInitialState());
+    emit(VaccineSearchInitialState(categories: categories));
   }
 
   /// Select a category — show subcategory dropdown.
-  Future<void> selectCategory(VaccineCategory category) async {
+  Future<void> selectCategory(VaccineCategoryModel category) async {
     selectedCategory = category;
     selectedSubcategory = null;
     vaccines = [];
 
-    if (category == VaccineCategory.travel) {
+    if (category.isTravel) {
       // Load available countries for autocomplete
       try {
         travelCountries = await _vaccineRepo.getTravelCountries();
@@ -45,8 +66,8 @@ class VaccineSearchCubit extends Cubit<VaccineSearchStates> {
         travelCountries = [];
       }
       emit(VaccineCategorySelectedState(category));
-    } else if (category == VaccineCategory.additional) {
-      // Load dynamic subcategories from Firestore
+    } else if (category.subcategories.isEmpty) {
+      // Load dynamic subcategories from Firestore (for categories with no pre-defined subs)
       try {
         final subs = await _vaccineRepo.getSubcategoriesForCategory(
           category.key,
@@ -57,7 +78,7 @@ class VaccineSearchCubit extends Cubit<VaccineSearchStates> {
         emit(VaccineCategorySelectedState(category));
       }
     } else {
-      // preschool / school — subcategories are static in enum
+      // Subcategories come from the category document
       emit(
         VaccineCategorySelectedState(
           category,
