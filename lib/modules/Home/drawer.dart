@@ -135,19 +135,11 @@ class AppDrawer extends StatelessWidget {
                 },
               ),
               _DrawerItem(
-                icon: Icons.notifications_rounded,
-                title: drawerNotifications,
+                icon: Icons.emergency_sharp,
+                title: drawerHotLine,
                 onTap: () {
                   Navigator.pop(context);
-                  // TODO: Navigate to notifications screen
-                },
-              ),
-              _DrawerItem(
-                icon: Icons.settings_rounded,
-                title: drawerSettings,
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to settings screen
+                  _showEmergencyDialog(context);
                 },
               ),
 
@@ -455,6 +447,75 @@ class AppDrawer extends StatelessWidget {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return parts[0][0].toUpperCase();
+  }
+
+  void _showEmergencyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: fischerBlue900,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: fischerBlue100.withValues(alpha: 0.15)),
+        ),
+        icon: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: red500.withValues(alpha: 0.15),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.emergency, color: red500, size: 32),
+        ),
+        title: const Text(
+          drawerHotLine,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Alexandria',
+          ),
+        ),
+        content: const Text(
+          '15335',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Alexandria',
+            letterSpacing: 1,
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: fischerBlue500,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Close',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Alexandria',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showLogoutDialog(BuildContext context, AuthCubit cubit) {

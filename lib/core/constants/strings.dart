@@ -257,6 +257,7 @@ const tryAgainOrContactSupport = 'يرجى المحاولة مرة أخرى أو
 const drawerHome = 'الرئيسية';
 const drawerProfile = 'الملف الشخصي';
 const drawerNotifications = 'الإشعارات';
+const drawerHotLine = 'الخط الساخن لوزارة الصحة';
 const drawerSettings = 'الإعدادات';
 const drawerAbout = 'حول التطبيق';
 const drawerContactUs = 'تواصل معنا';
