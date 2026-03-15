@@ -15,6 +15,7 @@ class VaccineDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThemedScaffold(
+      backgroundOpacity: 0.65,
       appBar: AppBar(
         title: Text(
           vaccine.name,
@@ -146,7 +147,7 @@ class _DetailCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
