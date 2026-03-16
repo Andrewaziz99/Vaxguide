@@ -6,6 +6,7 @@ import 'package:vaxguide/core/models/support_ticket_model.dart';
 import 'package:vaxguide/core/models/vaccine_alert_model.dart';
 import 'package:vaxguide/core/models/vaccine_category_model.dart';
 import 'package:vaxguide/core/models/vaccine_model.dart';
+import 'package:vaxguide/core/repositories/app_content_repo.dart';
 import 'package:vaxguide/core/repositories/article_repo.dart';
 import 'package:vaxguide/core/repositories/support_repo.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
@@ -20,6 +21,7 @@ class AdminCubit extends Cubit<AdminStates> {
   final UserRepo _userRepo;
   final SupportRepo _supportRepo;
   final VaccineCategoryRepo _categoryRepo;
+  final AppContentRepo _appContentRepo;
 
   AdminCubit({
     VaccineRepo? vaccineRepo,
@@ -28,12 +30,14 @@ class AdminCubit extends Cubit<AdminStates> {
     UserRepo? userRepo,
     SupportRepo? supportRepo,
     VaccineCategoryRepo? categoryRepo,
+    AppContentRepo? appContentRepo,
   }) : _vaccineRepo = vaccineRepo ?? VaccineRepo(),
        _articleRepo = articleRepo ?? ArticleRepo(),
        _alertRepo = alertRepo ?? VaccineAlertRepo(),
        _userRepo = userRepo ?? UserRepo(),
        _supportRepo = supportRepo ?? SupportRepo(),
        _categoryRepo = categoryRepo ?? VaccineCategoryRepo(),
+       _appContentRepo = appContentRepo ?? AppContentRepo(),
        super(AdminInitialState());
 
   static AdminCubit get(BuildContext context) => BlocProvider.of(context);
@@ -299,6 +303,26 @@ class AdminCubit extends Cubit<AdminStates> {
       emit(AdminSuccessState('تم حذف الفئة الفرعية بنجاح'));
     } catch (e) {
       debugPrint('AdminCubit removeSubcategory error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  // ══════════════════════════════════════════
+  // APP CONTENT
+  // ══════════════════════════════════════════
+
+  Stream<String> streamAboutText() => _appContentRepo.streamAboutText();
+
+  Future<void> updateAboutText({
+    required String text,
+    String? updatedBy,
+  }) async {
+    emit(AdminLoadingState());
+    try {
+      await _appContentRepo.updateAboutText(text: text, updatedBy: updatedBy);
+      emit(AdminSuccessState('تم تحديث نص حول التطبيق بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit updateAboutText error: $e');
       emit(AdminErrorState(e.toString()));
     }
   }

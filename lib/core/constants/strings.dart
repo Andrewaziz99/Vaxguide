@@ -303,7 +303,8 @@ const aboutFeatureAdminDesc =
 const aboutBuiltWith = 'مبني بـ';
 const aboutDeveloper = 'المطوّر';
 const aboutDeveloperName = 'Andrew Michel';
-const aboutDeveloperDesc = 'مطور تطبيقات Flutter';
+const aboutDeveloperDesc = 'andrewmichel2002@gmail.com';
+const aboutDeveloperPhone = '01550485922';
 const aboutCopyright = '© 2026 $appName. جميع الحقوق محفوظة.';
 
 // Contact Us / Support strings

@@ -1,12 +1,50 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vaxguide/core/constants/strings.dart';
+import 'package:vaxguide/core/repositories/app_content_repo.dart';
 import 'package:vaxguide/core/styles/colors.dart';
 import 'package:vaxguide/core/styles/themeScaffold.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
+
+  static final AppContentRepo _appContentRepo = AppContentRepo();
+
+  Future<void> _openDeveloperWhatsApp(BuildContext context) async {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final normalized = aboutDeveloperPhone.replaceAll(RegExp(r'[^0-9]'), '');
+    final e164 = normalized.startsWith('0')
+        ? '2${normalized.substring(1)}'
+        : normalized;
+
+    final whatsappUri = Uri.parse(
+      'whatsapp://send?phone=$e164&text=${Uri.encodeComponent('Hello Andrew, I contacted you from VaxGuide app.')}',
+    );
+    final waMeUri = Uri.parse(
+      'https://wa.me/$e164?text=${Uri.encodeComponent('Hello Andrew, I contacted you from VaxGuide app.')}',
+    );
+
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+      return;
+    }
+
+    if (await canLaunchUrl(waMeUri)) {
+      await launchUrl(waMeUri, mode: LaunchMode.externalApplication);
+      return;
+    }
+
+    messenger?.showSnackBar(
+      const SnackBar(
+        content: Text(
+          'تعذر فتح واتساب على هذا الجهاز',
+          style: TextStyle(fontFamily: 'Alexandria'),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,14 +139,20 @@ class AboutScreen extends StatelessWidget {
                     title: aboutWhatIs,
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    aboutDescription,
-                    style: TextStyle(
-                      fontFamily: 'Alexandria',
-                      fontSize: 13.5,
-                      color: Colors.white.withValues(alpha: 0.85),
-                      height: 1.7,
-                    ),
+                  StreamBuilder<String>(
+                    stream: _appContentRepo.streamAboutText(),
+                    builder: (context, snapshot) {
+                      final aboutText = snapshot.data ?? aboutDescription;
+                      return Text(
+                        aboutText,
+                        style: TextStyle(
+                          fontFamily: 'Alexandria',
+                          fontSize: 13.5,
+                          color: Colors.white.withValues(alpha: 0.85),
+                          height: 1.7,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -185,6 +229,25 @@ class AboutScreen extends StatelessWidget {
                       fontSize: 12,
                       color: Colors.white.withValues(alpha: 0.6),
                       height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  InkWell(
+                    onTap: () => _openDeveloperWhatsApp(context),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Text(
+                        aboutDeveloperPhone,
+                        style: TextStyle(
+                          fontFamily: 'Alexandria',
+                          fontSize: 12,
+                          color: fischerBlue100,
+                          height: 1.5,
+                          decoration: TextDecoration.underline,
+                          decorationColor: fischerBlue100,
+                        ),
+                      ),
                     ),
                   ),
                 ],

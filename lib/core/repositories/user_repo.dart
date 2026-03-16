@@ -91,6 +91,11 @@ class UserRepo {
     await _usersRef.doc(uid).update({'firstLogin': false});
   }
 
+  /// Mark the About popup as shown so it only appears once per user.
+  Future<void> markAboutPopupSeen(String uid) async {
+    await _usersRef.doc(uid).update({'aboutPopupSeen': true});
+  }
+
   // ── VACCINE HISTORY ──
 
   /// Add a vaccine history entry to the user's record.

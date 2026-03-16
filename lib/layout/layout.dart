@@ -1,6 +1,9 @@
 import 'package:circle_nav_bar/circle_nav_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vaxguide/core/constants/strings.dart';
+import 'package:vaxguide/core/repositories/app_content_repo.dart';
+import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/styles/colors.dart';
 import 'package:vaxguide/core/styles/themeScaffold.dart';
 import 'package:vaxguide/modules/History/history_screen.dart';
@@ -18,6 +21,9 @@ class AppLayout extends StatefulWidget {
 class _AppLayoutState extends State<AppLayout> {
   int _currentIndex = 2; // Start on first tab
   late final PageController _pageController;
+  final UserRepo _userRepo = UserRepo();
+  final AppContentRepo _appContentRepo = AppContentRepo();
+  bool _aboutDialogHandled = false;
 
   final List<Widget> _screens = const [
     HistoryScreen(),
@@ -31,6 +37,71 @@ class _AppLayoutState extends State<AppLayout> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeShowAboutPopup();
+    });
+  }
+
+  Future<void> _maybeShowAboutPopup() async {
+    if (_aboutDialogHandled || !mounted) return;
+    _aboutDialogHandled = true;
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    try {
+      final user = await _userRepo.getUserById(uid);
+      if (user == null || user.aboutPopupSeen) return;
+
+      final aboutText = await _appContentRepo.getAboutText();
+      if (!mounted) return;
+
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          backgroundColor: fischerBlue900,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            drawerAbout,
+            style: TextStyle(
+              fontFamily: 'Alexandria',
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Text(
+              aboutText,
+              style: TextStyle(
+                fontFamily: 'Alexandria',
+                color: Colors.white.withValues(alpha: 0.85),
+                height: 1.7,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                ok,
+                style: TextStyle(
+                  fontFamily: 'Alexandria',
+                  color: fischerBlue100,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      await _userRepo.markAboutPopupSeen(uid);
+    } catch (_) {
+      // Don't block app usage if user/about content lookup fails.
+    }
   }
 
   @override
