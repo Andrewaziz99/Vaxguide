@@ -16,7 +16,7 @@ class AboutScreen extends StatelessWidget {
     final messenger = ScaffoldMessenger.maybeOf(context);
     final normalized = aboutDeveloperPhone.replaceAll(RegExp(r'[^0-9]'), '');
     final e164 = normalized.startsWith('0')
-        ? '2${normalized.substring(1)}'
+        ? '20${normalized.substring(1)}'
         : normalized;
 
     final whatsappUri = Uri.parse(
@@ -237,16 +237,27 @@ class AboutScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Text(
-                        aboutDeveloperPhone,
-                        style: TextStyle(
-                          fontFamily: 'Alexandria',
-                          fontSize: 12,
-                          color: fischerBlue100,
-                          height: 1.5,
-                          decoration: TextDecoration.underline,
-                          decorationColor: fischerBlue100,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.phone_rounded,
+                            size: 15,
+                            color: Colors.greenAccent,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            aboutDeveloperPhone,
+                            style: TextStyle(
+                              fontFamily: 'Alexandria',
+                              fontSize: 12,
+                              color: fischerBlue100,
+                              height: 1.5,
+                              decoration: TextDecoration.underline,
+                              decorationColor: fischerBlue100,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
