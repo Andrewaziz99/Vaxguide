@@ -25,9 +25,17 @@ void main() async {
   await CacheHelper.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize push notifications
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  await NotificationService.instance.init();
+  // Initialize push notifications (web uses a different flow; avoid blocking startup)
+  if (!kIsWeb) {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    try {
+      await NotificationService.instance.init().timeout(
+        const Duration(seconds: 10),
+      );
+    } catch (e) {
+      debugPrint('Notification init skipped: $e');
+    }
+  }
 
   // Check if user is already logged in and session is still valid
   final bool isLoggedIn =
@@ -54,7 +62,9 @@ void main() async {
     if (uid != null) {
       try {
         final userRepo = UserRepo();
-        final user = await userRepo.getUserById(uid);
+        final user = await userRepo
+            .getUserById(uid)
+            .timeout(const Duration(seconds: 8));
         if (user != null && user.firstLogin) {
           final email =
               CacheHelper.getData(key: AuthConstants.cacheKeyEmail) ?? '';
@@ -78,7 +88,7 @@ void main() async {
 
   runApp(MyApp(startScreen: SplashScreen(destinationScreen: startScreen)));
 
-  // Remove the HTML loading screen on web after Flutter has started
+  // Remove the HTML loading screen on web after Flutter has started.
   if (kIsWeb) {
     removeWebLoadingScreen();
   }
