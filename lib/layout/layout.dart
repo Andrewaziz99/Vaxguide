@@ -16,7 +16,7 @@ class AppLayout extends StatefulWidget {
 }
 
 class _AppLayoutState extends State<AppLayout> {
-  int _currentIndex = 1; // Home is in the center
+  int _currentIndex = 2; // Start on first tab
   late final PageController _pageController;
 
   final List<Widget> _screens = const [
@@ -82,7 +82,7 @@ class _AppLayoutState extends State<AppLayout> {
           onTap: _onTabChanged,
           activeIcons: const [
             Icon(Icons.history_rounded, color: fischerBlue900, size: 28),
-            Icon(Icons.home_rounded, color: fischerBlue900, size: 28),
+            Icon(Icons.newspaper_rounded, color: fischerBlue900, size: 28),
             Icon(Icons.vaccines_rounded, color: fischerBlue900, size: 28),
           ],
           inactiveIcons: const [

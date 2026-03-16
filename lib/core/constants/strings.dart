@@ -254,7 +254,7 @@ const requestNotFound = 'لم يتم العثور على طلب التسجيل';
 const tryAgainOrContactSupport = 'يرجى المحاولة مرة أخرى أو الاتصال بالدعم';
 
 // Drawer strings
-const drawerHome = 'الرئيسية';
+const drawerHome = 'آخر الأخبار';
 const drawerProfile = 'الملف الشخصي';
 const drawerNotifications = 'الإشعارات';
 const drawerHotLine = 'الخط الساخن لوزارة الصحة';
@@ -366,7 +366,7 @@ const homeLoadError = 'حدث خطأ أثناء تحميل البيانات';
 const homeRetry = 'إعادة المحاولة';
 
 // Bottom Navigation strings
-const navHome = 'الرئيسية';
+const navHome = 'آخر الأخبار';
 const navHistory = 'السجل';
 const navVaccineSearch = 'بحث اللقاحات';
 
