@@ -6,12 +6,14 @@ class VaccineCategoryModel {
   final String key; // document ID (e.g. 'preschool', 'school', 'travel', ...)
   final String label; // Arabic display name
   final String icon; // Material icon name string
+  final int? displayOrder; // optional explicit category order (lower first)
   final List<String> subcategories;
 
   const VaccineCategoryModel({
     required this.key,
     required this.label,
     this.icon = 'vaccines_rounded',
+    this.displayOrder,
     this.subcategories = const [],
   });
 
@@ -21,26 +23,41 @@ class VaccineCategoryModel {
       key: doc.id,
       label: data['label'] ?? '',
       icon: data['icon'] ?? 'vaccines_rounded',
+      displayOrder: _toInt(data['displayOrder']),
       subcategories: List<String>.from(data['subcategories'] ?? []),
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {'label': label, 'icon': icon, 'subcategories': subcategories};
+    return {
+      'label': label,
+      'icon': icon,
+      if (displayOrder != null) 'displayOrder': displayOrder,
+      'subcategories': subcategories,
+    };
   }
 
   VaccineCategoryModel copyWith({
     String? key,
     String? label,
     String? icon,
+    int? displayOrder,
     List<String>? subcategories,
   }) {
     return VaccineCategoryModel(
       key: key ?? this.key,
       label: label ?? this.label,
       icon: icon ?? this.icon,
+      displayOrder: displayOrder ?? this.displayOrder,
       subcategories: subcategories ?? this.subcategories,
     );
+  }
+
+  static int? _toInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
   }
 
   /// Whether this category uses country-based travel search instead of subcategory dropdown.

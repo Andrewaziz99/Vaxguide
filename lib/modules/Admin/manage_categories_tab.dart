@@ -71,6 +71,7 @@ class _CategoryListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = AdminCubit.get(context);
+    final orderLabel = category.displayOrder?.toString() ?? 'افتراضي';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -103,7 +104,7 @@ class _CategoryListTile extends StatelessWidget {
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 2),
             child: Text(
-              'المفتاح: ${category.key}  •  ${category.subcategories.length} فئة فرعية',
+              'المفتاح: ${category.key}  •  الترتيب: $orderLabel  •  ${category.subcategories.length} فئة فرعية',
               style: TextStyle(
                 fontFamily: 'Alexandria',
                 color: fischerBlue300,

@@ -18,6 +18,7 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _keyCtrl;
   late final TextEditingController _labelCtrl;
+  late final TextEditingController _displayOrderCtrl;
   late String _selectedIcon;
   late List<String> _subcategories;
   final _subcategoryCtrl = TextEditingController();
@@ -30,6 +31,9 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
     final c = widget.category;
     _keyCtrl = TextEditingController(text: c?.key ?? '');
     _labelCtrl = TextEditingController(text: c?.label ?? '');
+    _displayOrderCtrl = TextEditingController(
+      text: c?.displayOrder?.toString() ?? '',
+    );
     _selectedIcon = c?.icon ?? 'vaccines_rounded';
     _subcategories = List<String>.from(c?.subcategories ?? []);
   }
@@ -38,6 +42,7 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
   void dispose() {
     _keyCtrl.dispose();
     _labelCtrl.dispose();
+    _displayOrderCtrl.dispose();
     _subcategoryCtrl.dispose();
     super.dispose();
   }
@@ -107,10 +112,22 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
                     hint: 'يستخدم كمعرف فريد - لا يمكن تغييره لاحقاً',
                   ),
                   // Label field
+                  _buildField(_labelCtrl, 'اسم الفئة (عربي)', required: true),
                   _buildField(
-                    _labelCtrl,
-                    'اسم الفئة (عربي)',
-                    required: true,
+                    _displayOrderCtrl,
+                    'ترتيب العرض (اختياري)',
+                    hint:
+                        'رقم أصغر يظهر أولاً - اتركه فارغاً للترتيب الافتراضي',
+                    keyboardType: TextInputType.number,
+                    validator: (v) {
+                      final text = (v ?? '').trim();
+                      if (text.isEmpty) return null;
+                      final parsed = int.tryParse(text);
+                      if (parsed == null || parsed < 0) {
+                        return 'أدخل رقم صحيح 0 أو أكبر';
+                      }
+                      return null;
+                    },
                   ),
                   // Icon picker
                   _buildIconPicker(),
@@ -165,12 +182,15 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
     bool required = false,
     bool enabled = true,
     String? hint,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
         controller: ctrl,
         enabled: enabled,
+        keyboardType: keyboardType,
         textDirection: TextDirection.rtl,
         style: TextStyle(
           fontFamily: 'Alexandria',
@@ -217,9 +237,12 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
           filled: true,
           fillColor: fischerBlue900.withValues(alpha: 0.5),
         ),
-        validator: required
-            ? (v) => (v == null || v.trim().isEmpty) ? 'هذا الحقل مطلوب' : null
-            : null,
+        validator:
+            validator ??
+            (required
+                ? (v) =>
+                      (v == null || v.trim().isEmpty) ? 'هذا الحقل مطلوب' : null
+                : null),
       ),
     );
   }
@@ -245,9 +268,7 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
             decoration: BoxDecoration(
               color: fischerBlue900.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: fischerBlue300.withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: fischerBlue300.withValues(alpha: 0.3)),
             ),
             child: Wrap(
               spacing: 6,
@@ -303,9 +324,7 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
           decoration: BoxDecoration(
             color: fischerBlue900.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: fischerBlue300.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: fischerBlue300.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
@@ -430,10 +449,12 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final key = _keyCtrl.text.trim().toLowerCase().replaceAll(' ', '_');
+    final orderText = _displayOrderCtrl.text.trim();
     final category = VaccineCategoryModel(
       key: isEditing ? widget.category!.key : key,
       label: _labelCtrl.text.trim(),
       icon: _selectedIcon,
+      displayOrder: orderText.isEmpty ? null : int.parse(orderText),
       subcategories: _subcategories,
     );
 
@@ -444,4 +465,3 @@ class _CategoryFormScreenState extends State<CategoryFormScreen> {
     }
   }
 }
-
