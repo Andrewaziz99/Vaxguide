@@ -154,7 +154,7 @@ class _DetailCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
