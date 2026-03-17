@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vaxguide/core/blocs/admin/admin_states.dart';
 import 'package:vaxguide/core/models/article_model.dart';
+import 'package:vaxguide/core/models/feedback_model.dart';
 import 'package:vaxguide/core/models/support_ticket_model.dart';
 import 'package:vaxguide/core/models/vaccine_alert_model.dart';
 import 'package:vaxguide/core/models/vaccine_category_model.dart';
 import 'package:vaxguide/core/models/vaccine_model.dart';
 import 'package:vaxguide/core/repositories/app_content_repo.dart';
 import 'package:vaxguide/core/repositories/article_repo.dart';
+import 'package:vaxguide/core/repositories/feedback_repo.dart';
 import 'package:vaxguide/core/repositories/support_repo.dart';
 import 'package:vaxguide/core/repositories/user_repo.dart';
 import 'package:vaxguide/core/repositories/vaccine_alert_repo.dart';
@@ -20,6 +22,7 @@ class AdminCubit extends Cubit<AdminStates> {
   final VaccineAlertRepo _alertRepo;
   final UserRepo _userRepo;
   final SupportRepo _supportRepo;
+  final FeedbackRepo _feedbackRepo;
   final VaccineCategoryRepo _categoryRepo;
   final AppContentRepo _appContentRepo;
 
@@ -29,6 +32,7 @@ class AdminCubit extends Cubit<AdminStates> {
     VaccineAlertRepo? alertRepo,
     UserRepo? userRepo,
     SupportRepo? supportRepo,
+    FeedbackRepo? feedbackRepo,
     VaccineCategoryRepo? categoryRepo,
     AppContentRepo? appContentRepo,
   }) : _vaccineRepo = vaccineRepo ?? VaccineRepo(),
@@ -36,6 +40,7 @@ class AdminCubit extends Cubit<AdminStates> {
        _alertRepo = alertRepo ?? VaccineAlertRepo(),
        _userRepo = userRepo ?? UserRepo(),
        _supportRepo = supportRepo ?? SupportRepo(),
+       _feedbackRepo = feedbackRepo ?? FeedbackRepo(),
        _categoryRepo = categoryRepo ?? VaccineCategoryRepo(),
        _appContentRepo = appContentRepo ?? AppContentRepo(),
        super(AdminInitialState());
@@ -235,6 +240,24 @@ class AdminCubit extends Cubit<AdminStates> {
       emit(AdminSuccessState('تم حذف التذكرة بنجاح'));
     } catch (e) {
       debugPrint('AdminCubit deleteTicket error: $e');
+      emit(AdminErrorState(e.toString()));
+    }
+  }
+
+  // ══════════════════════════════════════════
+  // USER FEEDBACK
+  // ══════════════════════════════════════════
+
+  Stream<List<FeedbackModel>> streamFeedback() =>
+      _feedbackRepo.streamAllFeedback();
+
+  Future<void> deleteFeedback(String id) async {
+    emit(AdminLoadingState());
+    try {
+      await _feedbackRepo.deleteFeedback(id);
+      emit(AdminSuccessState('تم حذف التقييم بنجاح'));
+    } catch (e) {
+      debugPrint('AdminCubit deleteFeedback error: $e');
       emit(AdminErrorState(e.toString()));
     }
   }

@@ -8,6 +8,7 @@ import 'package:vaxguide/modules/Admin/manage_about_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_alerts_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_articles_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_categories_tab.dart';
+import 'package:vaxguide/modules/Admin/manage_feedback_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_support_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_users_tab.dart';
 import 'package:vaxguide/modules/Admin/manage_vaccines_tab.dart';
@@ -44,7 +45,7 @@ class AdminPanelScreen extends StatelessWidget {
           }
         },
         child: DefaultTabController(
-          length: 7,
+          length: 8,
           child: ThemedScaffold(
             backgroundImagePath: 'assets/images/bg2.png',
             appBar: AppBar(
@@ -102,6 +103,10 @@ class AdminPanelScreen extends StatelessWidget {
                     text: 'الدعم',
                   ),
                   Tab(
+                    icon: Icon(Icons.rate_review_rounded, size: 20),
+                    text: 'التقييمات',
+                  ),
+                  Tab(
                     icon: Icon(Icons.info_rounded, size: 20),
                     text: 'حول التطبيق',
                   ),
@@ -116,6 +121,7 @@ class AdminPanelScreen extends StatelessWidget {
                 ManageAlertsTab(),
                 ManageUsersTab(),
                 ManageSupportTab(),
+                ManageFeedbackTab(),
                 ManageAboutTab(),
               ],
             ),

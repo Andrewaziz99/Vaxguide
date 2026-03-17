@@ -66,7 +66,7 @@ class _AppLayoutState extends State<AppLayout> {
             borderRadius: BorderRadius.circular(16),
           ),
           title: const Text(
-            drawerAbout,
+            message,
             style: TextStyle(
               fontFamily: 'Alexandria',
               color: Colors.white,

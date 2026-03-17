@@ -57,6 +57,7 @@ const error = 'حدث خطأ ما';
 const success = 'تم بنجاح';
 const noData = 'لا توجد بيانات';
 const welcome = 'مرحبًا بك في $appName';
+const message = 'رسالة';
 const enterEmail = 'الرجاء إدخال البريد الإلكتروني';
 const enterPassword = 'الرجاء إدخال كلمة المرور';
 const enterName = 'الرجاء إدخال الاسم';
